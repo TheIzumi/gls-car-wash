@@ -31,4 +31,3 @@ function submitBooking(event) {
 
     window.location.href = whatsappURL;
 }
-```
