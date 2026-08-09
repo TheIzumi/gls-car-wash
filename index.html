@@ -1,5 +1,7 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +25,7 @@
             Professional car wash service at an affordable price.
         </p>
 
-        <button onclick="bookNow()">
+        <button onclick="showBooking()">
             Book Now
         </button>
     </section>
@@ -49,6 +51,43 @@
 
     </section>
 
+    <section id="booking" class="booking">
+
+        <h2>📅 Book Your Car Wash</h2>
+
+        <form onsubmit="submitBooking(event)">
+
+            <label>Name</label>
+            <input type="text" id="name" placeholder="Your name" required>
+
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="01X-XXXXXXX" required>
+
+            <label>Car Model</label>
+            <input type="text" id="car" placeholder="e.g. Perodua Myvi" required>
+
+            <label>Select Service</label>
+            <select id="service" required>
+                <option value="">Choose a service</option>
+                <option value="Basic Wash - RM10">Basic Wash - RM10</option>
+                <option value="Wash + Vacuum - RM15">Wash + Vacuum - RM15</option>
+                <option value="Premium Wash - RM25">Premium Wash - RM25</option>
+            </select>
+
+            <label>Date</label>
+            <input type="date" id="date" required>
+
+            <label>Time</label>
+            <input type="time" id="time" required>
+
+            <button type="submit">
+                Confirm Booking
+            </button>
+
+        </form>
+
+    </section>
+
     <section class="contact">
 
         <h2>Contact Us</h2>
@@ -65,4 +104,6 @@
     <script src="script.js"></script>
 
 </body>
+
 </html>
+```
