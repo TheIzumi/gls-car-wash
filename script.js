@@ -15,20 +15,20 @@ function submitBooking(event) {
     const date = document.getElementById("date").value;
     const time = document.getElementById("time").value;
 
-    const message =
-        "🚗 *GLS Car Wash - New Booking*%0A%0A" +
-        "👤 Name: " + name + "%0A" +
-        "📞 Phone: " + phone + "%0A" +
-        "🚘 Car: " + car + "%0A" +
-        "🧼 Service: " + service + "%0A" +
-        "📅 Date: " + date + "%0A" +
-        "⏰ Time: " + time;
+    const message = `🚗 GLS Car Wash - New Booking
+
+👤 Name: ${name}
+📞 Phone: ${phone}
+🚘 Car: ${car}
+🧼 Service: ${service}
+📅 Date: ${date}
+⏰ Time: ${time}`;
 
     const whatsappNumber = "60128500418";
 
     const whatsappURL =
-        "https://wa.me/" + whatsappNumber + "?text=" + message;
+        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-    window.open(whatsappURL, "_blank");
+    window.location.href = whatsappURL;
 }
 ```
