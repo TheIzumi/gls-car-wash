@@ -24,7 +24,7 @@ function submitBooking(event) {
         "📅 Date: " + date + "%0A" +
         "⏰ Time: " + time;
 
-    const whatsappNumber = "601XXXXXXXXX";
+    const whatsappNumber = "60107795202";
 
     const whatsappURL =
         "https://wa.me/" + whatsappNumber + "?text=" + message;
