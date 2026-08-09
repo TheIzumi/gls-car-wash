@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GLS Car Wash</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🚗 GLS Car Wash</h1>
+        <p>Clean Car, Happy Drive!</p>
+    </header>
+
+    <section class="hero">
+        <h2>Welcome to GLS Car Wash</h2>
+
+        <p>
+            Professional car wash service at an affordable price.
+        </p>
+
+        <button onclick="bookNow()">
+            Book Now
+        </button>
+    </section>
+
+    <section class="services">
+
+        <h2>Our Services</h2>
+
+        <div class="service">
+            <h3>🚿 Basic Wash</h3>
+            <p>RM10</p>
+        </div>
+
+        <div class="service">
+            <h3>🧹 Wash + Vacuum</h3>
+            <p>RM15</p>
+        </div>
+
+        <div class="service">
+            <h3>✨ Premium Wash</h3>
+            <p>RM25</p>
+        </div>
+
+    </section>
+
+    <section class="contact">
+
+        <h2>Contact Us</h2>
+
+        <p>📍 Location: Your Car Wash Address</p>
+        <p>📞 Phone: 01X-XXXXXXX</p>
+
+    </section>
+
+    <footer>
+        <p>© 2026 GLS Car Wash</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
