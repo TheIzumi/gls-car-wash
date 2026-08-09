@@ -1,4 +1,3 @@
-```javascript
 function showBooking() {
     document.getElementById("booking").scrollIntoView({
         behavior: "smooth"
@@ -8,26 +7,29 @@ function showBooking() {
 function submitBooking(event) {
     event.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-    const car = document.getElementById("car").value;
-    const service = document.getElementById("service").value;
-    const date = document.getElementById("date").value;
-    const time = document.getElementById("time").value;
+    var name = document.getElementById("name").value;
+    var phone = document.getElementById("phone").value;
+    var car = document.getElementById("car").value;
+    var service = document.getElementById("service").value;
+    var date = document.getElementById("date").value;
+    var time = document.getElementById("time").value;
 
-    const message = `🚗 GLS Car Wash - New Booking
+    var message =
+        "GLS Car Wash - New Booking\n\n" +
+        "Name: " + name + "\n" +
+        "Phone: " + phone + "\n" +
+        "Car: " + car + "\n" +
+        "Service: " + service + "\n" +
+        "Date: " + date + "\n" +
+        "Time: " + time;
 
-👤 Name: ${name}
-📞 Phone: ${phone}
-🚘 Car: ${car}
-🧼 Service: ${service}
-📅 Date: ${date}
-⏰ Time: ${time}`;
+    var whatsappNumber = "60128500418";
 
-    const whatsappNumber = "60128500418";
-
-    const whatsappURL =
-        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    var whatsappURL =
+        "https://wa.me/" +
+        whatsappNumber +
+        "?text=" +
+        encodeURIComponent(message);
 
     window.location.href = whatsappURL;
 }
