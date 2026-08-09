@@ -1,3 +1,4 @@
+```javascript
 function showBooking() {
     document.getElementById("booking").scrollIntoView({
         behavior: "smooth"
