@@ -1,10 +1,9 @@
 /* =====================================================
    CAR WASH BY GLOBAL LINE SERVICES (GLS)
-   Authentication and Dashboard
+   Supabase Authentication and Dashboard
 ===================================================== */
 
 "use strict";
-
 
 /* =====================================================
    1. SUPABASE CONFIGURATION
@@ -13,67 +12,47 @@
 const GLS_SUPABASE_URL =
     "https://pvbfsrelqruxluhtqddh.supabase.co";
 
-// Replace the placeholder with your Supabase Publishable Key.
-// Keep the quotation marks.
-// Never use a Supabase Secret Key or service_role key here.
-
 const GLS_SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk";
+    "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
 
 /* =====================================================
-   2. MALAYSIA TIMEZONE
+   2. APPLICATION STATE
 ===================================================== */
 
 const GLS_TIMEZONE = "Asia/Kuala_Lumpur";
 
-
-/* =====================================================
-   3. DOM ELEMENTS
-===================================================== */
-
-const loginScreen = document.getElementById("login-screen");
-
-const loginForm = document.getElementById("login-form");
-
-const loginEmail = document.getElementById("login-email");
-
-const loginPassword = document.getElementById("login-password");
-
-const loginMessage = document.getElementById("login-message");
-
-const loginSubmit = document.getElementById("login-submit");
-
-const dashboard = document.getElementById("dashboard");
-
-const authStatus = document.getElementById("auth-status");
-
-const logoutButton = document.getElementById("logout-button");
-
-
-/* =====================================================
-   4. APPLICATION STATE
-===================================================== */
-
 let glsSupabase = null;
-
 let currentProfile = null;
-
 let loginInProgress = false;
 
 
 /* =====================================================
-   5. DATE AND YEAR
+   3. PAGE ELEMENTS
+===================================================== */
+
+const loginScreen = document.getElementById("login-screen");
+const loginForm = document.getElementById("login-form");
+const loginEmail = document.getElementById("login-email");
+const loginPassword = document.getElementById("login-password");
+const loginMessage = document.getElementById("login-message");
+const loginSubmit = document.getElementById("login-submit");
+
+const dashboard = document.getElementById("dashboard");
+const authStatus = document.getElementById("auth-status");
+const logoutButton = document.getElementById("logout-button");
+
+
+/* =====================================================
+   4. DATE AND YEAR
 ===================================================== */
 
 function updateCurrentDate() {
-    const dateElement = document.getElementById("current-date");
+    const element = document.getElementById("current-date");
 
-    if (!dateElement) {
-        return;
-    }
+    if (!element) return;
 
-    dateElement.textContent = new Intl.DateTimeFormat("en-GB", {
+    element.textContent = new Intl.DateTimeFormat("en-GB", {
         timeZone: GLS_TIMEZONE,
         weekday: "long",
         day: "numeric",
@@ -84,13 +63,11 @@ function updateCurrentDate() {
 
 
 function updateCurrentYear() {
-    const yearElement = document.getElementById("current-year");
+    const element = document.getElementById("current-year");
 
-    if (!yearElement) {
-        return;
-    }
+    if (!element) return;
 
-    yearElement.textContent = new Intl.DateTimeFormat("en", {
+    element.textContent = new Intl.DateTimeFormat("en", {
         timeZone: GLS_TIMEZONE,
         year: "numeric"
     }).format(new Date());
@@ -98,16 +75,13 @@ function updateCurrentYear() {
 
 
 /* =====================================================
-   6. LOGIN MESSAGES
+   5. LOGIN MESSAGES
 ===================================================== */
 
 function setLoginMessage(message, type = "error") {
-    if (!loginMessage) {
-        return;
-    }
+    if (!loginMessage) return;
 
     loginMessage.textContent = message;
-
     loginMessage.className = "login-message";
 
     if (type === "success") {
@@ -121,7 +95,7 @@ function setLoginMessage(message, type = "error") {
 
 
 /* =====================================================
-   7. DISPLAY LOGIN SCREEN
+   6. SHOW LOGIN SCREEN
 ===================================================== */
 
 function showLoginScreen(message = "", type = "error") {
@@ -142,6 +116,7 @@ function showLoginScreen(message = "", type = "error") {
     if (logoutButton) {
         logoutButton.hidden = true;
         logoutButton.disabled = false;
+        logoutButton.textContent = "Log Out";
     }
 
     setLoginMessage(message, type);
@@ -149,7 +124,7 @@ function showLoginScreen(message = "", type = "error") {
 
 
 /* =====================================================
-   8. DISPLAY AUTHENTICATED DASHBOARD
+   7. SHOW AUTHENTICATED DASHBOARD
 ===================================================== */
 
 function showDashboard(profile) {
@@ -164,18 +139,16 @@ function showDashboard(profile) {
     }
 
     if (authStatus) {
-        const displayName = profile.full_name || "GLS User";
+        const name = profile.full_name || "GLS User";
+        const role = profile.role === "admin" ? "Admin" : "Staff";
 
-        const roleName =
-            profile.role === "admin" ? "Admin" : "Staff";
-
-        authStatus.textContent =
-            `${displayName} · ${roleName}`;
+        authStatus.textContent = `${name} · ${role}`;
     }
 
     if (logoutButton) {
         logoutButton.hidden = false;
         logoutButton.disabled = false;
+        logoutButton.textContent = "Log Out";
     }
 
     if (loginPassword) {
@@ -190,42 +163,7 @@ function showDashboard(profile) {
 
 
 /* =====================================================
-   9. SIGN OUT SAFELY
-===================================================== */
-
-async function signOutLocally() {
-    if (!glsSupabase) {
-        showLoginScreen();
-        return;
-    }
-
-    const { error } = await glsSupabase.auth.signOut({
-        scope: "local"
-    });
-
-    if (error) {
-        console.error("GLS sign-out error:", error);
-
-        alert(
-            "We could not complete sign out. " +
-            "Please try again."
-        );
-
-        return false;
-    }
-
-    showLoginScreen();
-
-    if (loginEmail) {
-        loginEmail.focus();
-    }
-
-    return true;
-}
-
-
-/* =====================================================
-   10. VERIFY USER PROFILE AND ROLE
+   8. VERIFY USER PROFILE
 ===================================================== */
 
 async function verifyAndDisplayUser(session) {
@@ -233,14 +171,6 @@ async function verifyAndDisplayUser(session) {
         showLoginScreen();
         return false;
     }
-
-    /*
-     * Read the signed-in user's profile.
-     *
-     * Row Level Security must permit the user to read
-     * their own profile. The application does not trust
-     * a role value supplied by the browser.
-     */
 
     const {
         data: profile,
@@ -251,45 +181,31 @@ async function verifyAndDisplayUser(session) {
         .eq("id", session.user.id)
         .maybeSingle();
 
-
     if (error) {
-        console.error("GLS profile verification error:", error);
+        console.error("GLS profile verification failed:", error);
 
-        await glsSupabase.auth.signOut({
-            scope: "local"
-        });
+        await glsSupabase.auth.signOut({ scope: "local" });
 
         showLoginScreen(
-            "We could not verify your GLS profile. " +
-            "Please contact the administrator."
+            "Unable to verify your profile. Please contact the administrator."
         );
 
         return false;
     }
-
-
-    /*
-     * Only active profiles with an approved role
-     * may display the dashboard.
-     */
 
     if (
         !profile ||
         profile.is_active !== true ||
         !["admin", "staff"].includes(profile.role)
     ) {
-        await glsSupabase.auth.signOut({
-            scope: "local"
-        });
+        await glsSupabase.auth.signOut({ scope: "local" });
 
         showLoginScreen(
-            "This account does not have an active GLS profile. " +
-            "Please contact the administrator."
+            "This account has no active GLS profile. Please contact the administrator."
         );
 
         return false;
     }
-
 
     showDashboard(profile);
 
@@ -298,48 +214,29 @@ async function verifyAndDisplayUser(session) {
 
 
 /* =====================================================
-   11. LOGIN FORM
+   9. SIGN IN
 ===================================================== */
 
 async function handleLogin(event) {
     event.preventDefault();
 
-    if (loginInProgress) {
-        return;
-    }
-
-    if (!glsSupabase) {
-        setLoginMessage(
-            "The login system has not been configured yet."
-        );
-
+    if (loginInProgress || !glsSupabase) {
         return;
     }
 
     const email = loginEmail.value.trim();
-
     const password = loginPassword.value;
 
     if (!email || !password) {
-        setLoginMessage(
-            "Please enter your email address and password."
-        );
-
+        setLoginMessage("Enter your email address and password.");
         return;
     }
 
-
     loginInProgress = true;
-
     loginSubmit.disabled = true;
-
     loginSubmit.textContent = "Signing In...";
 
-    setLoginMessage(
-        "Verifying your account...",
-        "info"
-    );
-
+    setLoginMessage("Verifying your account...", "info");
 
     try {
         const {
@@ -350,33 +247,25 @@ async function handleLogin(event) {
             password
         });
 
-
         if (error) {
-            console.error("GLS login error:", error);
+            console.error("GLS login failed:", error);
 
             setLoginMessage(
-                "Sign-in failed. Check your email, password " +
-                "and email confirmation status."
+                "Sign-in failed. Check your email, password and account confirmation."
             );
 
             return;
         }
-
 
         if (!data.session || !data.user) {
-            setLoginMessage(
-                "Sign-in could not be completed. " +
-                "Please check your account status."
-            );
-
+            setLoginMessage("No active session was created.");
             return;
         }
-
 
         await verifyAndDisplayUser(data.session);
 
     } catch (error) {
-        console.error("GLS unexpected login error:", error);
+        console.error("Unexpected GLS login error:", error);
 
         setLoginMessage(
             "An unexpected error occurred. Please try again."
@@ -384,33 +273,51 @@ async function handleLogin(event) {
 
     } finally {
         loginInProgress = false;
-
         loginSubmit.disabled = false;
-
         loginSubmit.textContent = "Sign In";
     }
 }
 
 
 /* =====================================================
-   12. DASHBOARD ACTION PLACEHOLDERS
+   10. SIGN OUT
+===================================================== */
+
+async function handleLogout() {
+    if (!glsSupabase || logoutButton.disabled) {
+        return;
+    }
+
+    logoutButton.disabled = true;
+    logoutButton.textContent = "Signing Out...";
+
+    const { error } = await glsSupabase.auth.signOut({
+        scope: "local"
+    });
+
+    if (error) {
+        console.error("GLS logout failed:", error);
+
+        logoutButton.disabled = false;
+        logoutButton.textContent = "Log Out";
+
+        alert("Unable to sign out. Please try again.");
+        return;
+    }
+
+    showLoginScreen();
+
+    if (loginEmail) {
+        loginEmail.focus();
+    }
+}
+
+
+/* =====================================================
+   11. DASHBOARD PLACEHOLDERS
 ===================================================== */
 
 function showNotice(feature) {
-    const messages = {
-        "New Customer":
-            "Customer registration has not been implemented yet.",
-
-        "Record Payment":
-            "Payment recording has not been implemented yet.",
-
-        "Customer Records":
-            "Customer records have not been implemented yet.",
-
-        "Reports":
-            "Financial reports have not been implemented yet."
-    };
-
     if (!currentProfile) {
         showLoginScreen(
             "Please sign in before accessing the system."
@@ -419,26 +326,33 @@ function showNotice(feature) {
         return;
     }
 
-    alert(
-        messages[feature] ||
-        "This feature is not available yet."
-    );
+    const messages = {
+        "New Customer":
+            "The customer registration feature is not ready yet.",
+
+        "Record Payment":
+            "The payment recording feature is not ready yet.",
+
+        "Customer Records":
+            "Customer records are not available yet.",
+
+        "Reports":
+            "Financial reports are not available yet."
+    };
+
+    alert(messages[feature] || "This feature is not available yet.");
 }
 
 
 /* =====================================================
-   13. INITIALISE APPLICATION
+   12. INITIALISE APPLICATION
 ===================================================== */
 
 async function initialiseGLS() {
     updateCurrentDate();
-
     updateCurrentYear();
 
     showLoginScreen();
-
-
-    // Ensure the required page elements exist.
 
     if (
         !loginScreen ||
@@ -451,30 +365,20 @@ async function initialiseGLS() {
         !authStatus ||
         !logoutButton
     ) {
-        console.error(
-            "GLS initialisation failed: required HTML elements are missing."
-        );
-
+        console.error("GLS: Required HTML elements are missing.");
         return;
     }
-
-
-    // Check the Supabase JavaScript library.
 
     if (
         !window.supabase ||
         typeof window.supabase.createClient !== "function"
     ) {
         setLoginMessage(
-            "The login library could not be loaded. " +
-            "Refresh the page and try again."
+            "The Supabase library could not load. Refresh the page and try again."
         );
 
         return;
     }
-
-
-    // Check that the Publishable Key has been configured.
 
     if (
         !GLS_SUPABASE_PUBLISHABLE_KEY ||
@@ -482,15 +386,11 @@ async function initialiseGLS() {
             "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk"
     ) {
         setLoginMessage(
-            "Supabase setup is incomplete. " +
-            "Add the Publishable Key in script.js."
+            "Supabase setup is incomplete. Add the Publishable Key in script.js."
         );
 
         return;
     }
-
-
-    // Create the Supabase client.
 
     glsSupabase = window.supabase.createClient(
         GLS_SUPABASE_URL,
@@ -504,45 +404,14 @@ async function initialiseGLS() {
         }
     );
 
+    loginForm.addEventListener("submit", handleLogin);
+    logoutButton.addEventListener("click", handleLogout);
 
-    // Attach the login form handler.
-
-    loginForm.addEventListener(
-        "submit",
-        handleLogin
-    );
-
-
-    // Attach the logout handler.
-
-    logoutButton.addEventListener(
-        "click",
-        async function () {
-            if (logoutButton.disabled) {
-                return;
-            }
-
-            logoutButton.disabled = true;
-
-            logoutButton.textContent = "Signing Out...";
-
-            await signOutLocally();
+    glsSupabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_OUT") {
+            showLoginScreen();
         }
-    );
-
-
-    // Handle sign-out events in this browser session.
-
-    glsSupabase.auth.onAuthStateChange(
-        function (event) {
-            if (event === "SIGNED_OUT") {
-                showLoginScreen();
-            }
-        }
-    );
-
-
-    // Restore an existing session after a page refresh.
+    });
 
     try {
         const {
@@ -550,21 +419,15 @@ async function initialiseGLS() {
             error
         } = await glsSupabase.auth.getSession();
 
-
         if (error) {
-            console.error(
-                "GLS session restoration error:",
-                error
-            );
+            console.error("GLS session error:", error);
 
             showLoginScreen(
-                "We could not restore your session. " +
-                "Please sign in again."
+                "Unable to restore your session. Please sign in again."
             );
 
             return;
         }
-
 
         if (data.session) {
             await verifyAndDisplayUser(data.session);
@@ -573,28 +436,21 @@ async function initialiseGLS() {
         }
 
     } catch (error) {
-        console.error(
-            "GLS initialisation error:",
-            error
-        );
+        console.error("GLS initialisation error:", error);
 
         showLoginScreen(
-            "The application could not be initialised. " +
-            "Please refresh the page."
+            "The application could not start. Refresh the page and try again."
         );
     }
 }
 
 
 /* =====================================================
-   14. START APPLICATION
+   13. START APPLICATION
 ===================================================== */
 
 if (document.readyState === "loading") {
-    document.addEventListener(
-        "DOMContentLoaded",
-        initialiseGLS
-    );
+    document.addEventListener("DOMContentLoaded", initialiseGLS);
 } else {
     initialiseGLS();
 }
