@@ -25,7 +25,7 @@ const GLS_TIMEZONE = "Asia/Kuala_Lumpur";
 let glsSupabase = null;
 let currentProfile = null;
 let loginInProgress = false;
-
+let passwordRecoveryMode = false;
 
 /* =====================================================
    3. PAGE ELEMENTS
@@ -41,6 +41,28 @@ const loginSubmit = document.getElementById("login-submit");
 const dashboard = document.getElementById("dashboard");
 const authStatus = document.getElementById("auth-status");
 const logoutButton = document.getElementById("logout-button");
+
+// Password reset screen elements
+const passwordResetScreen =
+    document.getElementById("password-reset-screen");
+
+const passwordResetForm =
+    document.getElementById("password-reset-form");
+
+const newPasswordInput =
+    document.getElementById("new-password");
+
+const confirmNewPasswordInput =
+    document.getElementById("confirm-new-password");
+
+const passwordResetMessage =
+    document.getElementById("password-reset-message");
+
+const passwordResetSubmit =
+    document.getElementById("password-reset-submit");
+
+const backToLoginButton =
+    document.getElementById("back-to-login");
 
 
 /* =====================================================
@@ -100,6 +122,7 @@ function setLoginMessage(message, type = "error") {
 
 function showLoginScreen(message = "", type = "error") {
     currentProfile = null;
+    passwordRecoveryMode = false;
 
     if (loginScreen) {
         loginScreen.hidden = false;
@@ -107,6 +130,10 @@ function showLoginScreen(message = "", type = "error") {
 
     if (dashboard) {
         dashboard.hidden = true;
+    }
+
+    if (passwordResetScreen) {
+        passwordResetScreen.hidden = true;
     }
 
     if (authStatus) {
@@ -137,6 +164,10 @@ function showDashboard(profile) {
     if (dashboard) {
         dashboard.hidden = false;
     }
+
+   if (passwordResetScreen) {
+    passwordResetScreen.hidden = true;
+   }
 
     if (authStatus) {
         const name = profile.full_name || "GLS User";
@@ -278,6 +309,183 @@ async function handleLogin(event) {
     }
 }
 
+/* =====================================================
+   PASSWORD RESET
+===================================================== */
+
+function setPasswordResetMessage(message, type = "error") {
+    if (!passwordResetMessage) {
+        return;
+    }
+
+    passwordResetMessage.textContent = message;
+    passwordResetMessage.className = "login-message";
+
+    if (type === "success") {
+        passwordResetMessage.classList.add("success");
+    }
+
+    if (type === "info") {
+        passwordResetMessage.classList.add("info");
+    }
+}
+
+
+function showPasswordResetScreen() {
+    passwordRecoveryMode = true;
+    currentProfile = null;
+
+    if (loginScreen) {
+        loginScreen.hidden = true;
+    }
+
+    if (dashboard) {
+        dashboard.hidden = true;
+    }
+
+    if (passwordResetScreen) {
+        passwordResetScreen.hidden = false;
+    }
+
+    if (authStatus) {
+        authStatus.textContent = "Reset Password";
+    }
+
+    if (logoutButton) {
+        logoutButton.hidden = true;
+    }
+
+    if (newPasswordInput) {
+        newPasswordInput.value = "";
+    }
+
+    if (confirmNewPasswordInput) {
+        confirmNewPasswordInput.value = "";
+    }
+
+    setPasswordResetMessage(
+        "Enter your new password below.",
+        "info"
+    );
+
+    if (newPasswordInput) {
+        newPasswordInput.focus();
+    }
+}
+
+
+async function handlePasswordReset(event) {
+    event.preventDefault();
+
+    if (!glsSupabase || !passwordRecoveryMode) {
+        setPasswordResetMessage(
+            "Please open a valid password recovery link from your email."
+        );
+
+        return;
+    }
+
+    const newPassword = newPasswordInput.value;
+    const confirmPassword = confirmNewPasswordInput.value;
+
+    if (newPassword.length < 8) {
+        setPasswordResetMessage(
+            "Your password must contain at least 8 characters."
+        );
+
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        setPasswordResetMessage(
+            "The passwords do not match."
+        );
+
+        return;
+    }
+
+    passwordResetSubmit.disabled = true;
+    passwordResetSubmit.textContent = "Updating Password...";
+
+    setPasswordResetMessage(
+        "Updating your password securely...",
+        "info"
+    );
+
+    try {
+        const { error } = await glsSupabase.auth.updateUser({
+            password: newPassword
+        });
+
+        if (error) {
+            console.error("GLS password reset failed:", error);
+
+            setPasswordResetMessage(
+                "Unable to update your password. The recovery link may have expired. Request a new one and try again."
+            );
+
+            return;
+        }
+
+        if (newPasswordInput) {
+            newPasswordInput.value = "";
+        }
+
+        if (confirmNewPasswordInput) {
+            confirmNewPasswordInput.value = "";
+        }
+
+        // Sign out locally after the password is changed.
+        const { error: signOutError } =
+            await glsSupabase.auth.signOut({
+                scope: "local"
+            });
+
+        if (signOutError) {
+            console.warn(
+                "GLS local sign-out warning:",
+                signOutError
+            );
+        }
+
+        passwordRecoveryMode = false;
+
+        showLoginScreen(
+            "Password updated successfully. Please sign in with your new password.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Unexpected GLS password reset error:",
+            error
+        );
+
+        setPasswordResetMessage(
+            "An unexpected error occurred. Please try again."
+        );
+
+    } finally {
+        passwordResetSubmit.disabled = false;
+        passwordResetSubmit.textContent = "Update Password";
+    }
+}
+
+
+async function handleBackToLogin() {
+    if (glsSupabase) {
+        const { error } = await glsSupabase.auth.signOut({
+            scope: "local"
+        });
+
+        if (error) {
+            console.warn("GLS sign-out warning:", error);
+        }
+    }
+
+    passwordRecoveryMode = false;
+    showLoginScreen();
+}
 
 /* =====================================================
    10. SIGN OUT
@@ -363,6 +571,13 @@ async function initialiseGLS() {
         !loginSubmit ||
         !dashboard ||
         !authStatus ||
+       !passwordResetScreen ||
+!passwordResetForm ||
+!newPasswordInput ||
+!confirmNewPasswordInput ||
+!passwordResetMessage ||
+!passwordResetSubmit ||
+!backToLoginButton ||
         !logoutButton
     ) {
         console.error("GLS: Required HTML elements are missing.");
@@ -407,11 +622,23 @@ async function initialiseGLS() {
     loginForm.addEventListener("submit", handleLogin);
     logoutButton.addEventListener("click", handleLogout);
 
+   passwordResetForm.addEventListener(
+    "submit",
+    handlePasswordReset
+);
+
+backToLoginButton.addEventListener(
+    "click",
+    handleBackToLogin
+);
+
     glsSupabase.auth.onAuthStateChange((event) => {
-        if (event === "SIGNED_OUT") {
-            showLoginScreen();
-        }
-    });
+    if (event === "PASSWORD_RECOVERY") {
+        showPasswordResetScreen();
+    } else if (event === "SIGNED_OUT") {
+        showLoginScreen();
+    }
+});
 
     try {
         const {
