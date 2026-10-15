@@ -164,6 +164,95 @@
         hidden
     >
 
+        <!-- =========================================
+     RESET PASSWORD SCREEN
+========================================== -->
+
+<section
+    id="password-reset-screen"
+    class="login-section"
+    hidden
+>
+    <div class="login-card">
+
+        <div class="login-brand">
+            GLS
+        </div>
+
+        <p class="eyebrow">
+            GLOBAL LINE SERVICES
+        </p>
+
+        <h2>Reset Password</h2>
+
+        <p class="login-description">
+            Create a new password for your GLS account.
+        </p>
+
+        <form id="password-reset-form">
+
+            <label for="new-password">
+                New Password
+            </label>
+
+            <input
+                type="password"
+                id="new-password"
+                name="new-password"
+                placeholder="Enter your new password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+            >
+
+            <label for="confirm-new-password">
+                Confirm New Password
+            </label>
+
+            <input
+                type="password"
+                id="confirm-new-password"
+                name="confirm-new-password"
+                placeholder="Re-enter your new password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+            >
+
+            <p
+                id="password-reset-message"
+                class="login-message"
+                role="alert"
+                aria-live="polite"
+            ></p>
+
+            <button
+                id="password-reset-submit"
+                class="login-button"
+                type="submit"
+            >
+                Update Password
+            </button>
+
+        </form>
+
+        <button
+            id="back-to-login"
+            class="reset-back-button"
+            type="button"
+        >
+            Back to Sign In
+        </button>
+
+        <p class="login-footer">
+            Keep your password private.
+        </p>
+
+    </div>
+</section>
+
+<!-- END RESET PASSWORD SCREEN -->
+
         <!-- WELCOME SECTION -->
 
         <section class="welcome-section">
