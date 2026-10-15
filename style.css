@@ -1077,8 +1077,8 @@ input:focus-visible {
 /* GLS Official Logo */
 .brand-logo {
     display: block;
-    width: 76px;
-    height: 64px;
+    width: 45px;
+    height: 45px;
     object-fit: contain;
     flex-shrink: 0;
 }
