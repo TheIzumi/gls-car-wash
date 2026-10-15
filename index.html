@@ -511,6 +511,251 @@
 
         </section>
 
+<!-- =================================================
+     NEW CUSTOMER AND VEHICLE REGISTRATION
+================================================== -->
+
+<section
+    class="activity-section customer-registration-section"
+    id="new-customer-section"
+    hidden
+>
+
+    <div class="section-heading">
+
+        <div>
+            <h2>New Customer</h2>
+
+            <p>
+                Register a vehicle and record its car wash service.
+            </p>
+        </div>
+
+        <button
+            id="close-customer-panel"
+            class="secondary-button"
+            type="button"
+        >
+            Close
+        </button>
+
+    </div>
+
+
+    <!-- CUSTOMER FORM -->
+
+    <div class="service-form-card">
+
+        <h3>Customer & Vehicle Details</h3>
+
+        <p class="service-form-description">
+            Enter the customer details and select the service.
+        </p>
+
+
+        <form id="customer-transaction-form">
+
+
+            <!-- CUSTOMER NAME -->
+
+            <div class="service-form-grid">
+
+                <div class="form-field">
+
+                    <label for="customer-name">
+                        Customer Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="customer-name"
+                        name="customer-name"
+                        placeholder="Enter customer name"
+                        maxlength="150"
+                    >
+
+                </div>
+
+
+                <!-- CUSTOMER PHONE -->
+
+                <div class="form-field">
+
+                    <label for="customer-phone">
+                        Phone Number
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="customer-phone"
+                        name="customer-phone"
+                        placeholder="Enter phone number (optional)"
+                        maxlength="30"
+                        autocomplete="tel"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- VEHICLE TYPE -->
+
+            <div class="form-field">
+
+                <label for="transaction-vehicle-type">
+                    Vehicle Type
+                </label>
+
+                <select
+                    id="transaction-vehicle-type"
+                    name="vehicle-type"
+                    required
+                >
+
+                    <option value="">
+                        Select vehicle type
+                    </option>
+
+                    <option value="Car">
+                        Car
+                    </option>
+
+                    <option value="SUV/MPV">
+                        SUV / MPV
+                    </option>
+
+                    <option value="4x4">
+                        4x4
+                    </option>
+
+                    <option value="Motorcycle">
+                        Motorcycle
+                    </option>
+
+                    <option value="Van">
+                        Van
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- SERVICE SELECTION -->
+
+            <div class="form-field">
+
+                <label for="transaction-service-id">
+                    Car Wash Service
+                </label>
+
+                <select
+                    id="transaction-service-id"
+                    name="service-id"
+                    required
+                    disabled
+                >
+
+                    <option value="">
+                        Select vehicle type first
+                    </option>
+
+                </select>
+
+                <small class="field-help">
+                    Only active services for the selected vehicle type will appear.
+                </small>
+
+            </div>
+
+
+            <!-- SERVICE PRICE -->
+
+            <div class="transaction-price-card">
+
+                <span>
+                    Service Price
+                </span>
+
+                <strong id="transaction-price">
+                    RM 0.00
+                </strong>
+
+                <p>
+                    The price will be taken from the service record in the database.
+                </p>
+
+            </div>
+
+
+            <!-- PAYMENT INFORMATION -->
+
+            <div class="transaction-payment-note">
+
+                <span class="payment-note-icon">
+                    💳
+                </span>
+
+                <div>
+
+                    <strong>
+                        Payment will be recorded separately
+                    </strong>
+
+                    <p>
+                        Saving this form creates an unpaid transaction.
+                        Payment will be recorded in the next step.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORM MESSAGE -->
+
+            <p
+                id="customer-form-message"
+                class="service-form-message"
+                role="status"
+                aria-live="polite"
+            ></p>
+
+
+            <!-- FORM ACTIONS -->
+
+            <div class="service-form-actions">
+
+                <button
+                    type="submit"
+                    id="customer-save-button"
+                    class="primary-button"
+                >
+                    Save Customer & Transaction
+                </button>
+
+                <button
+                    type="button"
+                    id="customer-clear-button"
+                    class="secondary-button"
+                >
+                    Clear Form
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+<!-- END NEW CUSTOMER REGISTRATION -->
 
         <!-- =================================================
              SERVICES AND PRICING MANAGEMENT
