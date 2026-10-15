@@ -1,35 +1,79 @@
-function showBooking() {
-    document.getElementById("booking").scrollIntoView({
-        behavior: "smooth"
-    });
+/* =========================================
+   GLS CAR WASH MANAGEMENT SYSTEM
+   Dashboard Functions
+========================================= */
+
+// Malaysia timezone
+const GLS_TIMEZONE = "Asia/Kuala_Lumpur";
+
+// Display the current date
+function updateCurrentDate() {
+    const dateElement = document.getElementById("current-date");
+
+    if (!dateElement) {
+        return;
+    }
+
+    const today = new Intl.DateTimeFormat("en-GB", {
+        timeZone: GLS_TIMEZONE,
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }).format(new Date());
+
+    dateElement.textContent = today;
 }
 
-function submitBooking(event) {
-    event.preventDefault();
+// Display the current year in the footer
+function updateCurrentYear() {
+    const yearElement = document.getElementById("current-year");
 
-    var name = document.getElementById("name").value;
-    var phone = document.getElementById("phone").value;
-    var car = document.getElementById("car").value;
-    var service = document.getElementById("service").value;
-    var date = document.getElementById("date").value;
-    var time = document.getElementById("time").value;
+    if (!yearElement) {
+        return;
+    }
 
-    var message =
-        "GLS Car Wash - New Booking\n\n" +
-        "Name: " + name + "\n" +
-        "Phone: " + phone + "\n" +
-        "Car: " + car + "\n" +
-        "Service: " + service + "\n" +
-        "Date: " + date + "\n" +
-        "Time: " + time;
+    yearElement.textContent = new Intl.DateTimeFormat("en", {
+        timeZone: GLS_TIMEZONE,
+        year: "numeric"
+    }).format(new Date());
+}
 
-    var whatsappNumber = "60128500418";
+// Temporary messages for dashboard buttons
+function showNotice(feature) {
+    const messages = {
+        "New Customer":
+            "The New Customer feature is not ready yet. We will build the customer registration form next.",
 
-    var whatsappURL =
-        "https://wa.me/" +
-        whatsappNumber +
-        "?text=" +
-        encodeURIComponent(message);
+        "Record Payment":
+            "The payment recording feature is not ready yet. We will build it in a later step.",
 
-    window.location.href = whatsappURL;
+        "Customer Records":
+            "Customer records will be available after we build the customer management feature.",
+
+        "Reports":
+            "Revenue reports will be available after we build the transaction and reporting features."
+    };
+
+    const message = messages[feature];
+
+    if (message) {
+        alert(message);
+    }
+}
+
+// Initialise the dashboard
+function initialiseDashboard() {
+    updateCurrentDate();
+    updateCurrentYear();
+}
+
+// Run when the page is ready
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiseDashboard
+    );
+} else {
+    initialiseDashboard();
 }
