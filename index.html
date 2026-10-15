@@ -1,4 +1,477 @@
-    <!-- <script src="script.js"></script> -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="theme-color"
+        content="#14283f"
+    >
+
+    <meta
+        name="description"
+        content="Car Wash Management System for Global Line Services."
+    >
+
+    <title>GLS Car Wash Management</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="app-header">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                GLS
+            </div>
+
+            <div>
+                <h1>Car Wash</h1>
+                <p>Global Line Services</p>
+            </div>
+
+        </div>
+
+        <div class="header-status">
+
+            <span class="status-dot"></span>
+
+            <span id="auth-status">
+                Please sign in
+            </span>
+
+            <button
+                id="logout-button"
+                class="logout-button"
+                type="button"
+                hidden
+            >
+                Log Out
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         LOGIN SCREEN
+    ========================================== -->
+
+    <section
+        id="login-screen"
+        class="login-section"
+    >
+
+        <div class="login-card">
+
+            <div class="login-brand">
+                GLS
+            </div>
+
+            <p class="eyebrow">
+                GLOBAL LINE SERVICES
+            </p>
+
+            <h2>Welcome Back</h2>
+
+            <p class="login-description">
+                Sign in to GLS Car Wash Management System.
+            </p>
+
+
+            <!-- LOGIN FORM -->
+
+            <form id="login-form">
+
+                <label for="login-email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="login-email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="username"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    required
+                >
+
+
+                <label for="login-password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="login-password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <p
+                    id="login-message"
+                    class="login-message"
+                    role="alert"
+                    aria-live="polite"
+                ></p>
+
+
+                <button
+                    id="login-submit"
+                    class="login-button"
+                    type="submit"
+                >
+                    Sign In
+                </button>
+
+            </form>
+
+
+            <p class="login-footer">
+                Authorized personnel only.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         MAIN DASHBOARD
+
+         Hidden until JavaScript verifies that
+         the user is signed in and authorized.
+    ========================================== -->
+
+    <main
+        class="dashboard"
+        id="dashboard"
+        hidden
+    >
+
+        <!-- WELCOME SECTION -->
+
+        <section class="welcome-section">
+
+            <div>
+
+                <p class="eyebrow">
+                    CAR WASH MANAGEMENT
+                </p>
+
+                <h2>Dashboard</h2>
+
+                <p class="welcome-text">
+                    Welcome to GLS Car Wash Management System.
+                </p>
+
+            </div>
+
+
+            <div class="date-card">
+
+                <span>
+                    Today's Date
+                </span>
+
+                <strong id="current-date">
+                    Loading...
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             DAILY SUMMARY CARDS
+        ====================================== -->
+
+        <section class="summary-grid">
+
+
+            <!-- CUSTOMER COUNT -->
+
+            <article class="summary-card">
+
+                <div class="card-icon">
+                    🚗
+                </div>
+
+                <p>
+                    Today's Customers
+                </p>
+
+                <h3 id="total-customers">
+                    0
+                </h3>
+
+                <span class="card-note">
+                    Vehicles served today
+                </span>
+
+            </article>
+
+
+            <!-- REVENUE -->
+
+            <article class="summary-card">
+
+                <div class="card-icon">
+                    💰
+                </div>
+
+                <p>
+                    Today's Revenue
+                </p>
+
+                <h3 id="total-revenue">
+                    RM 0.00
+                </h3>
+
+                <span class="card-note">
+                    Recorded payments
+                </span>
+
+            </article>
+
+
+            <!-- TRANSACTIONS -->
+
+            <article class="summary-card">
+
+                <div class="card-icon">
+                    🧾
+                </div>
+
+                <p>
+                    Transactions
+                </p>
+
+                <h3 id="total-transactions">
+                    0
+                </h3>
+
+                <span class="card-note">
+                    Recorded today
+                </span>
+
+            </article>
+
+        </section>
+
+
+        <!-- =====================================
+             QUICK ACTIONS
+        ====================================== -->
+
+        <section class="action-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Quick Actions
+                    </h2>
+
+                    <p>
+                        Manage daily car wash operations.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="action-grid">
+
+
+                <!-- NEW CUSTOMER -->
+
+                <button
+                    class="action-card"
+                    type="button"
+                    onclick="showNotice('New Customer')"
+                >
+
+                    <span class="action-icon">
+                        🚘
+                    </span>
+
+                    <span class="action-title">
+                        New Customer
+                    </span>
+
+                    <span class="action-description">
+                        Record a customer and vehicle.
+                    </span>
+
+                </button>
+
+
+                <!-- RECORD PAYMENT -->
+
+                <button
+                    class="action-card"
+                    type="button"
+                    onclick="showNotice('Record Payment')"
+                >
+
+                    <span class="action-icon">
+                        💳
+                    </span>
+
+                    <span class="action-title">
+                        Record Payment
+                    </span>
+
+                    <span class="action-description">
+                        Record cash, QR or other payments.
+                    </span>
+
+                </button>
+
+
+                <!-- CUSTOMER RECORDS -->
+
+                <button
+                    class="action-card"
+                    type="button"
+                    onclick="showNotice('Customer Records')"
+                >
+
+                    <span class="action-icon">
+                        📋
+                    </span>
+
+                    <span class="action-title">
+                        Customer Records
+                    </span>
+
+                    <span class="action-description">
+                        View customer and service records.
+                    </span>
+
+                </button>
+
+
+                <!-- REPORTS -->
+
+                <button
+                    class="action-card"
+                    type="button"
+                    onclick="showNotice('Reports')"
+                >
+
+                    <span class="action-icon">
+                        📊
+                    </span>
+
+                    <span class="action-title">
+                        Reports
+                    </span>
+
+                    <span class="action-description">
+                        Review daily, weekly and monthly income.
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             RECENT TRANSACTIONS
+        ====================================== -->
+
+        <section class="activity-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Recent Transactions
+                    </h2>
+
+                    <p>
+                        Your latest recorded car wash services.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    🧾
+                </div>
+
+                <h3>
+                    No transactions yet
+                </h3>
+
+                <p>
+                    Customer and payment records will appear here
+                    once the transaction feature is implemented.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             FOOTER
+        ====================================== -->
+
+        <footer class="app-footer">
+
+            <p>
+                &copy;
+                <span id="current-year"></span>
+                Car Wash by Global Line Services (GLS)
+            </p>
+
+            <p>
+                Management System
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <!-- =========================================
+         JAVASCRIPT LIBRARIES
+
+         Supabase JavaScript SDK v2
+    ========================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>
