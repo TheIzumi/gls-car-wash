@@ -2089,6 +2089,8 @@ async function initialiseGLS() {
         }
     );
 
+   window.supabase.createClient
+
 
     /* Authentication forms */
 
