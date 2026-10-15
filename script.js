@@ -2077,7 +2077,7 @@ async function initialiseGLS() {
         return;
     }
 
-    glsSupabase = window.supabase.createClient(
+        glsSupabase = window.supabase.createClient(
         GLS_SUPABASE_URL,
         GLS_SUPABASE_PUBLISHABLE_KEY,
         {
@@ -2089,7 +2089,8 @@ async function initialiseGLS() {
         }
     );
 
-   window.supabase.createClient
+    // Share the existing Supabase client with dashboard.js
+    window.glsSupabase = glsSupabase;
 
 
     /* Authentication forms */
