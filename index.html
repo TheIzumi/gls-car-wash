@@ -758,6 +758,92 @@
 <!-- END NEW CUSTOMER REGISTRATION -->
 
         <!-- =================================================
+     GLS PAYMENT MANAGEMENT
+================================================== -->
+
+<section
+    class="activity-section payment-management-section"
+    id="payment-management-section"
+    hidden
+>
+
+    <div class="section-heading">
+
+        <div>
+            <h2>Record Payment</h2>
+
+            <p>
+                Review unpaid transactions and record customer payments.
+            </p>
+        </div>
+
+        <button
+            id="close-payment-panel"
+            class="secondary-button"
+            type="button"
+        >
+            Close
+        </button>
+
+    </div>
+
+
+    <!-- PAYMENT SUMMARY -->
+
+    <div class="payment-summary-card">
+
+        <div class="card-icon">
+            💳
+        </div>
+
+        <div>
+            <h3>Outstanding Transactions</h3>
+
+            <p>
+                Select a transaction to record the payment received.
+            </p>
+        </div>
+
+        <button
+            id="refresh-payment-list"
+            class="secondary-button"
+            type="button"
+        >
+            Refresh
+        </button>
+
+    </div>
+
+
+    <!-- PAYMENT STATUS MESSAGE -->
+
+    <p
+        id="payment-form-message"
+        class="service-form-message"
+        role="status"
+        aria-live="polite"
+    ></p>
+
+
+    <!-- UNPAID TRANSACTIONS -->
+
+    <div
+        id="unpaid-transactions-list"
+        class="unpaid-transactions-list"
+        aria-live="polite"
+    >
+
+        <div class="services-loading">
+            Unpaid transactions will appear here.
+        </div>
+
+    </div>
+
+</section>
+
+<!-- END GLS PAYMENT MANAGEMENT -->
+        
+        <!-- =================================================
              SERVICES AND PRICING MANAGEMENT
 
              The panel will be connected to Supabase
