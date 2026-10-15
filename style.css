@@ -1073,3 +1073,12 @@ input:focus-visible {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+/* GLS Official Logo */
+.brand-logo {
+    display: block;
+    width: 76px;
+    height: 64px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
