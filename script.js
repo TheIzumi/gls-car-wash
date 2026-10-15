@@ -5,19 +5,21 @@
 
 "use strict";
 
-/* 1. SUPABASE CONFIGURATION */
+
+/* =====================================================
+   1. SUPABASE CONFIGURATION
+===================================================== */
 
 const GLS_SUPABASE_URL =
     "https://pvbfsrelqruxluhtqddh.supabase.co";
-
-// Replace this placeholder with your actual Supabase
-// Publishable Key. Never use a Secret or service_role key.
 
 const GLS_SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk";
 
 
-/* 2. APPLICATION STATE */
+/* =====================================================
+   2. APPLICATION STATE
+===================================================== */
 
 const GLS_TIMEZONE = "Asia/Kuala_Lumpur";
 
@@ -30,13 +32,18 @@ const initialHashParams = new URLSearchParams(
     window.location.hash.replace(/^#/, "")
 );
 
+const initialQueryParams = new URLSearchParams(
+    window.location.search
+);
+
 let passwordRecoveryMode =
     initialHashParams.get("type") === "recovery" ||
-    new URLSearchParams(window.location.search)
-        .get("type") === "recovery";
+    initialQueryParams.get("type") === "recovery";
 
 
-/* 3. PAGE ELEMENTS */
+/* =====================================================
+   3. PAGE ELEMENTS
+===================================================== */
 
 const loginScreen =
     document.getElementById("login-screen");
@@ -55,6 +62,7 @@ const loginMessage =
 
 const loginSubmit =
     document.getElementById("login-submit");
+
 
 const passwordResetScreen =
     document.getElementById("password-reset-screen");
@@ -77,6 +85,7 @@ const passwordResetSubmit =
 const backToLoginButton =
     document.getElementById("back-to-login");
 
+
 const dashboard =
     document.getElementById("dashboard");
 
@@ -87,13 +96,17 @@ const logoutButton =
     document.getElementById("logout-button");
 
 
-/* 4. DATE AND YEAR */
+/* =====================================================
+   4. DATE AND YEAR
+===================================================== */
 
 function updateCurrentDate() {
     const element =
         document.getElementById("current-date");
 
-    if (!element) return;
+    if (!element) {
+        return;
+    }
 
     element.textContent = new Intl.DateTimeFormat(
         "en-GB",
@@ -112,7 +125,9 @@ function updateCurrentYear() {
     const element =
         document.getElementById("current-year");
 
-    if (!element) return;
+    if (!element) {
+        return;
+    }
 
     element.textContent = new Intl.DateTimeFormat(
         "en",
@@ -124,13 +139,17 @@ function updateCurrentYear() {
 }
 
 
-/* 5. LOGIN MESSAGES */
+/* =====================================================
+   5. LOGIN MESSAGES
+===================================================== */
 
 function setLoginMessage(
     message,
     type = "error"
 ) {
-    if (!loginMessage) return;
+    if (!loginMessage) {
+        return;
+    }
 
     loginMessage.textContent = message;
     loginMessage.className = "login-message";
@@ -147,7 +166,9 @@ function setPasswordResetMessage(
     message,
     type = "error"
 ) {
-    if (!passwordResetMessage) return;
+    if (!passwordResetMessage) {
+        return;
+    }
 
     passwordResetMessage.textContent = message;
     passwordResetMessage.className = "login-message";
@@ -160,7 +181,9 @@ function setPasswordResetMessage(
 }
 
 
-/* 6. SHOW LOGIN SCREEN */
+/* =====================================================
+   6. SHOW LOGIN SCREEN
+===================================================== */
 
 function showLoginScreen(
     message = "",
@@ -194,7 +217,9 @@ function showLoginScreen(
 }
 
 
-/* 7. SHOW PASSWORD RESET SCREEN */
+/* =====================================================
+   7. SHOW PASSWORD RESET SCREEN
+===================================================== */
 
 function showPasswordResetScreen() {
     passwordRecoveryMode = true;
@@ -239,7 +264,9 @@ function showPasswordResetScreen() {
 }
 
 
-/* 8. SHOW AUTHORIZED DASHBOARD */
+/* =====================================================
+   8. SHOW AUTHORIZED DASHBOARD
+===================================================== */
 
 function showDashboard(profile) {
     currentProfile = profile;
@@ -261,7 +288,9 @@ function showDashboard(profile) {
         const name = profile.full_name || "GLS User";
 
         const role =
-            profile.role === "admin" ? "Admin" : "Staff";
+            profile.role === "admin"
+                ? "Admin"
+                : "Staff";
 
         authStatus.textContent = `${name} · ${role}`;
     }
@@ -283,7 +312,9 @@ function showDashboard(profile) {
 }
 
 
-/* 9. VERIFY AUTHENTICATED USER PROFILE */
+/* =====================================================
+   9. VERIFY AUTHENTICATED USER PROFILE
+===================================================== */
 
 async function verifyAndDisplayUser(session) {
     if (passwordRecoveryMode) {
@@ -308,7 +339,7 @@ async function verifyAndDisplayUser(session) {
     if (error) {
         console.error(
             "GLS profile verification failed:",
-            error
+            error.message
         );
 
         await glsSupabase.auth.signOut({
@@ -344,7 +375,9 @@ async function verifyAndDisplayUser(session) {
 }
 
 
-/* 10. LOGIN */
+/* =====================================================
+   10. LOGIN
+===================================================== */
 
 async function handleLogin(event) {
     event.preventDefault();
@@ -364,6 +397,7 @@ async function handleLogin(event) {
         setLoginMessage(
             "Enter your email address and password."
         );
+
         return;
     }
 
@@ -402,6 +436,7 @@ async function handleLogin(event) {
             setLoginMessage(
                 "No active session was created."
             );
+
             return;
         }
 
@@ -425,7 +460,9 @@ async function handleLogin(event) {
 }
 
 
-/* 11. RESET PASSWORD */
+/* =====================================================
+   11. RESET PASSWORD
+===================================================== */
 
 async function handlePasswordReset(event) {
     event.preventDefault();
@@ -449,6 +486,7 @@ async function handlePasswordReset(event) {
         setPasswordResetMessage(
             "Your password must contain at least 8 characters."
         );
+
         return;
     }
 
@@ -456,6 +494,7 @@ async function handlePasswordReset(event) {
         setPasswordResetMessage(
             "The passwords do not match."
         );
+
         return;
     }
 
@@ -511,6 +550,13 @@ async function handlePasswordReset(event) {
             "success"
         );
 
+        // Remove recovery tokens from the visible URL.
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+
     } catch (error) {
         console.error(
             "Unexpected password update error:",
@@ -529,11 +575,15 @@ async function handlePasswordReset(event) {
 }
 
 
-/* 12. BACK TO LOGIN */
+/* =====================================================
+   12. BACK TO LOGIN
+===================================================== */
 
 async function handleBackToLogin() {
     if (glsSupabase) {
-        const { error } = await glsSupabase.auth.signOut({
+        const {
+            error
+        } = await glsSupabase.auth.signOut({
             scope: "local"
         });
 
@@ -546,11 +596,20 @@ async function handleBackToLogin() {
     }
 
     passwordRecoveryMode = false;
+
+    window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+    );
+
     showLoginScreen();
 }
 
 
-/* 13. LOGOUT */
+/* =====================================================
+   13. LOGOUT
+===================================================== */
 
 async function handleLogout() {
     if (!glsSupabase || logoutButton.disabled) {
@@ -560,7 +619,9 @@ async function handleLogout() {
     logoutButton.disabled = true;
     logoutButton.textContent = "Signing Out...";
 
-    const { error } = await glsSupabase.auth.signOut({
+    const {
+        error
+    } = await glsSupabase.auth.signOut({
         scope: "local"
     });
 
@@ -574,6 +635,7 @@ async function handleLogout() {
         logoutButton.textContent = "Log Out";
 
         alert("Unable to sign out. Please try again.");
+
         return;
     }
 
@@ -586,13 +648,16 @@ async function handleLogout() {
 }
 
 
-/* 14. DASHBOARD PLACEHOLDER BUTTONS */
+/* =====================================================
+   14. DASHBOARD PLACEHOLDER BUTTONS
+===================================================== */
 
 function showNotice(feature) {
     if (!currentProfile) {
         showLoginScreen(
             "Please sign in before accessing the system."
         );
+
         return;
     }
 
@@ -617,7 +682,9 @@ function showNotice(feature) {
 }
 
 
-/* 15. INITIALISE APPLICATION */
+/* =====================================================
+   15. INITIALISE APPLICATION
+===================================================== */
 
 async function initialiseGLS() {
     updateCurrentDate();
@@ -646,8 +713,9 @@ async function initialiseGLS() {
 
     if (requiredElements.some(element => !element)) {
         console.error(
-            "GLS initialisation failed: HTML elements are missing."
+            "GLS initialisation failed: required HTML elements are missing."
         );
+
         return;
     }
 
@@ -658,20 +726,33 @@ async function initialiseGLS() {
         setLoginMessage(
             "The Supabase library could not load. Refresh the page and try again."
         );
+
         return;
     }
 
+
+    /*
+     * CORRECT KEY VALIDATION
+     *
+     * Do not compare the key with itself.
+     * Check only whether it is empty or still a placeholder.
+     */
+
     if (
-    !GLS_SUPABASE_PUBLISHABLE_KEY ||
-    GLS_SUPABASE_PUBLISHABLE_KEY.trim() === "" ||
-    GLS_SUPABASE_PUBLISHABLE_KEY ===
-        "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk"
-) {
-    setLoginMessage(
-        "Supabase setup is incomplete. Add the Publishable Key in script.js."
-    );
-    return;
-}
+        !GLS_SUPABASE_PUBLISHABLE_KEY ||
+        GLS_SUPABASE_PUBLISHABLE_KEY.trim() === "" ||
+        GLS_SUPABASE_PUBLISHABLE_KEY ===
+            "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+    ) {
+        setLoginMessage(
+            "Supabase setup is incomplete. Add the Publishable Key in script.js."
+        );
+
+        return;
+    }
+
+
+    /* Create Supabase client */
 
     glsSupabase = window.supabase.createClient(
         GLS_SUPABASE_URL,
@@ -684,6 +765,9 @@ async function initialiseGLS() {
             }
         }
     );
+
+
+    /* Register event handlers */
 
     loginForm.addEventListener(
         "submit",
@@ -705,6 +789,9 @@ async function initialiseGLS() {
         handleLogout
     );
 
+
+    /* Handle authentication state changes */
+
     glsSupabase.auth.onAuthStateChange(
         (event) => {
             if (event === "PASSWORD_RECOVERY") {
@@ -719,6 +806,9 @@ async function initialiseGLS() {
             }
         }
     );
+
+
+    /* Restore an existing session */
 
     try {
         const {
@@ -735,6 +825,7 @@ async function initialiseGLS() {
             showLoginScreen(
                 "Unable to restore your session. Please sign in again."
             );
+
             return;
         }
 
@@ -745,6 +836,7 @@ async function initialiseGLS() {
 
         if (data.session) {
             await verifyAndDisplayUser(data.session);
+
         } else {
             showLoginScreen();
         }
@@ -762,7 +854,9 @@ async function initialiseGLS() {
 }
 
 
-/* 16. START APPLICATION */
+/* =====================================================
+   16. START APPLICATION
+===================================================== */
 
 if (document.readyState === "loading") {
     document.addEventListener(
