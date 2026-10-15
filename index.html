@@ -1,16 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="theme-color" content="#14283f">
-
-    <meta
-        name="description"
-        content="Car Wash Management System for Global Line Services."
-    >
+    <meta name="description" content="Car Wash Management System for Global Line Services.">
 
     <title>GLS Car Wash Management</title>
 
@@ -19,34 +15,29 @@
 
 <body>
 
-    <!-- =================================================
-         HEADER
-    ================================================== -->
+    <!-- HEADER -->
 
     <header class="app-header">
 
         <div class="brand">
 
-    <img
-        src="./Logo%203.png"
-        alt="Global Line Services Logo"
-        class="brand-logo"
-    >
+            <img
+                src="./Logo%203.png?v=2"
+                alt="Global Line Services Logo"
+                class="brand-logo"
+            >
 
-    <div>
-        <h1>Car Wash</h1>
-        <p>Global Line Services</p>
-    </div>
+            <div>
+                <h1>Car Wash</h1>
+                <p>Global Line Services</p>
+            </div>
 
-</div>
+        </div>
 
         <div class="header-status">
-
             <span class="status-dot"></span>
 
-            <span id="auth-status">
-                Please sign in
-            </span>
+            <span id="auth-status">Please sign in</span>
 
             <button
                 id="logout-button"
@@ -56,30 +47,24 @@
             >
                 Log Out
             </button>
-
         </div>
 
     </header>
 
 
-    <!-- =================================================
-         LOGIN SCREEN
-    ================================================== -->
+    <!-- LOGIN SCREEN -->
 
-    <section
-        id="login-screen"
-        class="login-section"
-    >
+    <section id="login-screen" class="login-section">
 
         <div class="login-card">
 
-            <div class="login-brand">
-                GLS
-            </div>
+            <img
+                src="./Logo%203.png?v=2"
+                alt="Global Line Services Logo"
+                class="login-brand-logo"
+            >
 
-            <p class="eyebrow">
-                GLOBAL LINE SERVICES
-            </p>
+            <p class="eyebrow">GLOBAL LINE SERVICES</p>
 
             <h2>Welcome Back</h2>
 
@@ -89,9 +74,7 @@
 
             <form id="login-form">
 
-                <label for="login-email">
-                    Email Address
-                </label>
+                <label for="login-email">Email Address</label>
 
                 <input
                     type="email"
@@ -104,9 +87,7 @@
                     required
                 >
 
-                <label for="login-password">
-                    Password
-                </label>
+                <label for="login-password">Password</label>
 
                 <input
                     type="password"
@@ -143,12 +124,7 @@
     </section>
 
 
-    <!-- =================================================
-         PASSWORD RESET SCREEN
-
-         IMPORTANT:
-         Keep this outside the hidden dashboard.
-    ================================================== -->
+    <!-- PASSWORD RESET SCREEN -->
 
     <section
         id="password-reset-screen"
@@ -158,13 +134,13 @@
 
         <div class="login-card">
 
-            <div class="login-brand">
-                GLS
-            </div>
+            <img
+                src="./Logo%203.png?v=2"
+                alt="Global Line Services Logo"
+                class="login-brand-logo"
+            >
 
-            <p class="eyebrow">
-                GLOBAL LINE SERVICES
-            </p>
+            <p class="eyebrow">GLOBAL LINE SERVICES</p>
 
             <h2>Reset Password</h2>
 
@@ -174,9 +150,7 @@
 
             <form id="password-reset-form">
 
-                <label for="new-password">
-                    New Password
-                </label>
+                <label for="new-password">New Password</label>
 
                 <input
                     type="password"
@@ -188,9 +162,7 @@
                     required
                 >
 
-                <label for="confirm-new-password">
-                    Confirm New Password
-                </label>
+                <label for="confirm-new-password">Confirm New Password</label>
 
                 <input
                     type="password"
@@ -236,154 +208,71 @@
     </section>
 
 
-    <!-- =================================================
-         MAIN DASHBOARD
+    <!-- MAIN DASHBOARD -->
 
-         Hidden until JavaScript verifies the user's
-         Supabase session and active GLS profile.
-    ================================================== -->
+    <main id="dashboard" class="dashboard" hidden>
 
-    <main
-        id="dashboard"
-        class="dashboard"
-        hidden
-    >
-
-
-        <!-- =================================================
-             WELCOME SECTION
-        ================================================== -->
+        <!-- WELCOME -->
 
         <section class="welcome-section">
 
             <div>
-
-                <p class="eyebrow">
-                    CAR WASH MANAGEMENT
-                </p>
-
+                <p class="eyebrow">CAR WASH MANAGEMENT</p>
                 <h2>Dashboard</h2>
 
                 <p class="welcome-text">
                     Welcome to GLS Car Wash Management System.
                 </p>
-
             </div>
 
             <div class="date-card">
-
-                <span>
-                    Today's Date
-                </span>
-
-                <strong id="current-date">
-                    Loading...
-                </strong>
-
+                <span>Today's Date</span>
+                <strong id="current-date">Loading...</strong>
             </div>
 
         </section>
 
 
-        <!-- =================================================
-             DAILY SUMMARY
-        ================================================== -->
+        <!-- DAILY SUMMARY -->
 
         <section class="summary-grid">
 
-
-            <!-- CUSTOMER COUNT -->
-
             <article class="summary-card">
-
-                <div class="card-icon">
-                    🚗
-                </div>
-
-                <p>
-                    Today's Customers
-                </p>
-
+                <div class="card-icon">🚗</div>
+                <p>Today's Customers</p>
                 <h3 id="today-customers-value">0</h3>
-
-                <span class="card-note">
-                    Vehicles served today
-                </span>
-
+                <span class="card-note">Vehicles served today</span>
             </article>
 
-
-            <!-- REVENUE -->
-
             <article class="summary-card">
-
-                <div class="card-icon">
-                    💰
-                </div>
-
-                <p>
-                    Today's Revenue
-                </p>
-
+                <div class="card-icon">💰</div>
+                <p>Today's Revenue</p>
                 <h3 id="today-revenue-value">RM 0.00</h3>
-
-                <span class="card-note">
-                    Recorded payments
-                </span>
-
+                <span class="card-note">Recorded payments</span>
             </article>
 
-
-            <!-- TRANSACTIONS -->
-
             <article class="summary-card">
-
-                <div class="card-icon">
-                    🧾
-                </div>
-
-                <p>
-                    Transactions
-                </p>
-
+                <div class="card-icon">🧾</div>
+                <p>Transactions</p>
                 <h3 id="today-transactions-value">0</h3>
-
-                <span class="card-note">
-                    Recorded today
-                </span>
-
+                <span class="card-note">Recorded today</span>
             </article>
 
         </section>
 
 
-        <!-- =================================================
-             QUICK ACTIONS
-        ================================================== -->
+        <!-- QUICK ACTIONS -->
 
         <section class="action-section">
 
             <div class="section-heading">
-
                 <div>
-
-                    <h2>
-                        Quick Actions
-                    </h2>
-
-                    <p>
-                        Manage daily car wash operations.
-                    </p>
-
+                    <h2>Quick Actions</h2>
+                    <p>Manage daily car wash operations.</p>
                 </div>
-
             </div>
 
-
             <div class="action-grid">
-
-
-                <!-- NEW CUSTOMER -->
 
                 <button
                     class="action-card"
@@ -391,23 +280,12 @@
                     type="button"
                     onclick="showNotice('New Customer')"
                 >
-
-                    <span class="action-icon">
-                        🚘
-                    </span>
-
-                    <span class="action-title">
-                        New Customer
-                    </span>
-
+                    <span class="action-icon">🚘</span>
+                    <span class="action-title">New Customer</span>
                     <span class="action-description">
                         Record a customer and vehicle.
                     </span>
-
                 </button>
-
-
-                <!-- RECORD PAYMENT -->
 
                 <button
                     class="action-card"
@@ -415,23 +293,12 @@
                     type="button"
                     onclick="showNotice('Record Payment')"
                 >
-
-                    <span class="action-icon">
-                        💳
-                    </span>
-
-                    <span class="action-title">
-                        Record Payment
-                    </span>
-
+                    <span class="action-icon">💳</span>
+                    <span class="action-title">Record Payment</span>
                     <span class="action-description">
                         Record cash, QR or other payments.
                     </span>
-
                 </button>
-
-
-                <!-- CUSTOMER RECORDS -->
 
                 <button
                     class="action-card"
@@ -439,23 +306,12 @@
                     type="button"
                     onclick="showNotice('Customer Records')"
                 >
-
-                    <span class="action-icon">
-                        📋
-                    </span>
-
-                    <span class="action-title">
-                        Customer Records
-                    </span>
-
+                    <span class="action-icon">📋</span>
+                    <span class="action-title">Customer Records</span>
                     <span class="action-description">
                         View customer and service records.
                     </span>
-
                 </button>
-
-
-                <!-- REPORTS -->
 
                 <button
                     class="action-card"
@@ -463,23 +319,12 @@
                     type="button"
                     onclick="showNotice('Reports')"
                 >
-
-                    <span class="action-icon">
-                        📊
-                    </span>
-
-                    <span class="action-title">
-                        Reports
-                    </span>
-
+                    <span class="action-icon">📊</span>
+                    <span class="action-title">Reports</span>
                     <span class="action-description">
                         Review daily, weekly and monthly income.
                     </span>
-
                 </button>
-
-
-                <!-- ADMIN: MANAGE SERVICES -->
 
                 <button
                     class="action-card"
@@ -488,363 +333,236 @@
                     onclick="showNotice('Manage Services & Pricing')"
                     hidden
                 >
-
-                    <span class="action-icon">
-                        🧽
-                    </span>
-
-                    <span class="action-title">
-                        Manage Services & Pricing
-                    </span>
-
+                    <span class="action-icon">🧽</span>
+                    <span class="action-title">Manage Services & Pricing</span>
                     <span class="action-description">
                         Add services, update prices and manage availability.
                     </span>
-
                 </button>
 
             </div>
 
         </section>
 
-<!-- =================================================
-     NEW CUSTOMER AND VEHICLE REGISTRATION
-================================================== -->
 
-<section
-    class="activity-section customer-registration-section"
-    id="new-customer-section"
-    hidden
->
+        <!-- NEW CUSTOMER AND VEHICLE REGISTRATION -->
 
-    <div class="section-heading">
-
-        <div>
-            <h2>New Customer</h2>
-
-            <p>
-                Register a vehicle and record its car wash service.
-            </p>
-        </div>
-
-        <button
-            id="close-customer-panel"
-            class="secondary-button"
-            type="button"
+        <section
+            class="activity-section customer-registration-section"
+            id="new-customer-section"
+            hidden
         >
-            Close
-        </button>
 
-    </div>
-
-
-    <!-- CUSTOMER FORM -->
-
-    <div class="service-form-card">
-
-        <h3>Customer & Vehicle Details</h3>
-
-        <p class="service-form-description">
-            Enter the customer details and select the service.
-        </p>
-
-
-        <form id="customer-transaction-form">
-
-
-            <!-- CUSTOMER NAME -->
-
-            <div class="service-form-grid">
-
-                <div class="form-field">
-
-                    <label for="customer-name">
-                        Customer Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="customer-name"
-                        name="customer-name"
-                        placeholder="Enter customer name"
-                        maxlength="150"
-                    >
-
+            <div class="section-heading">
+                <div>
+                    <h2>New Customer</h2>
+                    <p>Register a vehicle and record its car wash service.</p>
                 </div>
 
-
-                <!-- CUSTOMER PHONE -->
-
-                <div class="form-field">
-
-                    <label for="customer-phone">
-                        Phone Number
-                    </label>
-
-                    <input
-                        type="tel"
-                        id="customer-phone"
-                        name="customer-phone"
-                        placeholder="Enter phone number (optional)"
-                        maxlength="30"
-                        autocomplete="tel"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- VEHICLE TYPE -->
-
-            <div class="form-field">
-
-                <label for="transaction-vehicle-type">
-                    Vehicle Type
-                </label>
-
-                <select
-                    id="transaction-vehicle-type"
-                    name="vehicle-type"
-                    required
+                <button
+                    id="close-customer-panel"
+                    class="secondary-button"
+                    type="button"
                 >
-
-                    <option value="">
-                        Select vehicle type
-                    </option>
-
-                    <option value="Car">
-                        Car
-                    </option>
-
-                    <option value="SUV/MPV">
-                        SUV / MPV
-                    </option>
-
-                    <option value="4x4">
-                        4x4
-                    </option>
-
-                    <option value="Motorcycle">
-                        Motorcycle
-                    </option>
-
-                    <option value="Van">
-                        Van
-                    </option>
-
-                    <option value="Other">
-                        Other
-                    </option>
-
-                </select>
-
+                    Close
+                </button>
             </div>
 
+            <div class="service-form-card">
 
-            <!-- SERVICE SELECTION -->
+                <h3>Customer &amp; Vehicle Details</h3>
 
-            <div class="form-field">
-
-                <label for="transaction-service-id">
-                    Car Wash Service
-                </label>
-
-                <select
-                    id="transaction-service-id"
-                    name="service-id"
-                    required
-                    disabled
-                >
-
-                    <option value="">
-                        Select vehicle type first
-                    </option>
-
-                </select>
-
-                <small class="field-help">
-                    Only active services for the selected vehicle type will appear.
-                </small>
-
-            </div>
-
-
-            <!-- SERVICE PRICE -->
-
-            <div class="transaction-price-card">
-
-                <span>
-                    Service Price
-                </span>
-
-                <strong id="transaction-price">
-                    RM 0.00
-                </strong>
-
-                <p>
-                    The price will be taken from the service record in the database.
+                <p class="service-form-description">
+                    Enter the customer details and select the service.
                 </p>
 
+                <form id="customer-transaction-form">
+
+                    <div class="service-form-grid">
+
+                        <div class="form-field">
+                            <label for="customer-name">Customer Name</label>
+
+                            <input
+                                type="text"
+                                id="customer-name"
+                                name="customer-name"
+                                placeholder="Enter customer name"
+                                maxlength="150"
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label for="customer-phone">Phone Number</label>
+
+                            <input
+                                type="tel"
+                                id="customer-phone"
+                                name="customer-phone"
+                                placeholder="Enter phone number (optional)"
+                                maxlength="30"
+                                autocomplete="tel"
+                            >
+                        </div>
+
+                    </div>
+
+                    <div class="form-field">
+                        <label for="transaction-vehicle-type">Vehicle Type</label>
+
+                        <select
+                            id="transaction-vehicle-type"
+                            name="vehicle-type"
+                            required
+                        >
+                            <option value="">Select vehicle type</option>
+                            <option value="Car">Car</option>
+                            <option value="SUV/MPV">SUV / MPV</option>
+                            <option value="4x4">4x4</option>
+                            <option value="Motorcycle">Motorcycle</option>
+                            <option value="Van">Van</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="transaction-service-id">Car Wash Service</label>
+
+                        <select
+                            id="transaction-service-id"
+                            name="service-id"
+                            required
+                            disabled
+                        >
+                            <option value="">Select vehicle type first</option>
+                        </select>
+
+                        <small class="field-help">
+                            Only active services for the selected vehicle type will appear.
+                        </small>
+                    </div>
+
+                    <div class="transaction-price-card">
+                        <span>Service Price</span>
+                        <strong id="transaction-price">RM 0.00</strong>
+                        <p>
+                            The price will be taken from the service record in the database.
+                        </p>
+                    </div>
+
+                    <div class="transaction-payment-note">
+                        <span class="payment-note-icon">💳</span>
+
+                        <div>
+                            <strong>Payment will be recorded separately</strong>
+                            <p>
+                                Saving this form creates an unpaid transaction.
+                                Payment will be recorded in the next step.
+                            </p>
+                        </div>
+                    </div>
+
+                    <p
+                        id="customer-form-message"
+                        class="service-form-message"
+                        role="status"
+                        aria-live="polite"
+                    ></p>
+
+                    <div class="service-form-actions">
+
+                        <button
+                            type="submit"
+                            id="customer-save-button"
+                            class="primary-button"
+                        >
+                            Save Customer &amp; Transaction
+                        </button>
+
+                        <button
+                            type="button"
+                            id="customer-clear-button"
+                            class="secondary-button"
+                        >
+                            Clear Form
+                        </button>
+
+                    </div>
+
+                </form>
+
             </div>
 
+        </section>
 
-            <!-- PAYMENT INFORMATION -->
 
-            <div class="transaction-payment-note">
+        <!-- PAYMENT MANAGEMENT -->
 
-                <span class="payment-note-icon">
-                    💳
-                </span>
+        <section
+            class="activity-section payment-management-section"
+            id="payment-management-section"
+            hidden
+        >
 
+            <div class="section-heading">
                 <div>
-
-                    <strong>
-                        Payment will be recorded separately
-                    </strong>
-
+                    <h2>Record Payment</h2>
                     <p>
-                        Saving this form creates an unpaid transaction.
-                        Payment will be recorded in the next step.
+                        Review unpaid transactions and record customer payments.
                     </p>
-
                 </div>
 
+                <button
+                    id="close-payment-panel"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Close
+                </button>
             </div>
 
+            <div class="payment-summary-card">
 
-            <!-- FORM MESSAGE -->
+                <div class="card-icon">💳</div>
+
+                <div>
+                    <h3>Outstanding Transactions</h3>
+                    <p>
+                        Select a transaction to record the payment received.
+                    </p>
+                </div>
+
+                <button
+                    id="refresh-payment-list"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Refresh
+                </button>
+
+            </div>
 
             <p
-                id="customer-form-message"
+                id="payment-form-message"
                 class="service-form-message"
                 role="status"
                 aria-live="polite"
             ></p>
 
-
-            <!-- FORM ACTIONS -->
-
-            <div class="service-form-actions">
-
-                <button
-                    type="submit"
-                    id="customer-save-button"
-                    class="primary-button"
-                >
-                    Save Customer & Transaction
-                </button>
-
-                <button
-                    type="button"
-                    id="customer-clear-button"
-                    class="secondary-button"
-                >
-                    Clear Form
-                </button>
-
+            <div
+                id="unpaid-transactions-list"
+                class="unpaid-transactions-list"
+                aria-live="polite"
+            >
+                <div class="services-loading">
+                    Unpaid transactions will appear here.
+                </div>
             </div>
 
-        </form>
-
-    </div>
-
-</section>
-
-<!-- END NEW CUSTOMER REGISTRATION -->
-
-        <!-- =================================================
-     GLS PAYMENT MANAGEMENT
-================================================== -->
-
-<section
-    class="activity-section payment-management-section"
-    id="payment-management-section"
-    hidden
->
-
-    <div class="section-heading">
-
-        <div>
-            <h2>Record Payment</h2>
-
-            <p>
-                Review unpaid transactions and record customer payments.
-            </p>
-        </div>
-
-        <button
-            id="close-payment-panel"
-            class="secondary-button"
-            type="button"
-        >
-            Close
-        </button>
-
-    </div>
+        </section>
 
 
-    <!-- PAYMENT SUMMARY -->
-
-    <div class="payment-summary-card">
-
-        <div class="card-icon">
-            💳
-        </div>
-
-        <div>
-            <h3>Outstanding Transactions</h3>
-
-            <p>
-                Select a transaction to record the payment received.
-            </p>
-        </div>
-
-        <button
-            id="refresh-payment-list"
-            class="secondary-button"
-            type="button"
-        >
-            Refresh
-        </button>
-
-    </div>
-
-
-    <!-- PAYMENT STATUS MESSAGE -->
-
-    <p
-        id="payment-form-message"
-        class="service-form-message"
-        role="status"
-        aria-live="polite"
-    ></p>
-
-
-    <!-- UNPAID TRANSACTIONS -->
-
-    <div
-        id="unpaid-transactions-list"
-        class="unpaid-transactions-list"
-        aria-live="polite"
-    >
-
-        <div class="services-loading">
-            Unpaid transactions will appear here.
-        </div>
-
-    </div>
-
-</section>
-
-<!-- END GLS PAYMENT MANAGEMENT -->
-        
-        <!-- =================================================
-             SERVICES AND PRICING MANAGEMENT
-
-             The panel will be connected to Supabase
-             in the next JavaScript update.
-        ================================================== -->
+        <!-- SERVICES AND PRICING MANAGEMENT -->
 
         <section
             class="activity-section services-management-section"
@@ -853,17 +571,9 @@
         >
 
             <div class="section-heading">
-
                 <div>
-
-                    <h2>
-                        Services & Pricing
-                    </h2>
-
-                    <p>
-                        Manage car wash services and prices in RM.
-                    </p>
-
+                    <h2>Services &amp; Pricing</h2>
+                    <p>Manage car wash services and prices in RM.</p>
                 </div>
 
                 <button
@@ -873,40 +583,24 @@
                 >
                     Close
                 </button>
-
             </div>
-
-
-            <!-- SERVICE FORM -->
 
             <div class="service-form-card">
 
-                <h3 id="service-form-heading">
-                    Add New Service
-                </h3>
+                <h3 id="service-form-heading">Add New Service</h3>
 
                 <p class="service-form-description">
                     Enter the service details below.
                 </p>
 
-
                 <form id="service-form">
 
-                    <input
-                        type="hidden"
-                        id="service-id"
-                    >
+                    <input type="hidden" id="service-id">
 
                     <div class="service-form-grid">
 
-
-                        <!-- SERVICE NAME -->
-
                         <div class="form-field">
-
-                            <label for="service-name">
-                                Service Name
-                            </label>
+                            <label for="service-name">Service Name</label>
 
                             <input
                                 type="text"
@@ -916,64 +610,28 @@
                                 maxlength="100"
                                 required
                             >
-
                         </div>
 
-
-                        <!-- VEHICLE TYPE -->
-
                         <div class="form-field">
-
-                            <label for="service-vehicle-type">
-                                Vehicle Type
-                            </label>
+                            <label for="service-vehicle-type">Vehicle Type</label>
 
                             <select
                                 id="service-vehicle-type"
                                 name="vehicle-type"
                                 required
                             >
-
-                                <option value="">
-                                    Select vehicle type
-                                </option>
-
-                                <option value="Car">
-                                    Car
-                                </option>
-
-                                <option value="SUV/MPV">
-                                    SUV / MPV
-                                </option>
-
-                                <option value="4x4">
-                                    4x4
-                                </option>
-
-                                <option value="Motorcycle">
-                                    Motorcycle
-                                </option>
-
-                                <option value="Van">
-                                    Van
-                                </option>
-
-                                <option value="Other">
-                                    Other
-                                </option>
-
+                                <option value="">Select vehicle type</option>
+                                <option value="Car">Car</option>
+                                <option value="SUV/MPV">SUV / MPV</option>
+                                <option value="4x4">4x4</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Van">Van</option>
+                                <option value="Other">Other</option>
                             </select>
-
                         </div>
 
-
-                        <!-- SERVICE PRICE -->
-
                         <div class="form-field">
-
-                            <label for="service-price">
-                                Price (RM)
-                            </label>
+                            <label for="service-price">Price (RM)</label>
 
                             <input
                                 type="number"
@@ -986,31 +644,19 @@
                                 inputmode="decimal"
                                 required
                             >
-
                         </div>
 
                     </div>
 
-
-                    <!-- SERVICE STATUS -->
-
                     <label class="service-active-label">
-
                         <input
                             type="checkbox"
                             id="service-active"
                             name="service-active"
                             checked
                         >
-
-                        <span>
-                            Service is active and available
-                        </span>
-
+                        <span>Service is active and available</span>
                     </label>
-
-
-                    <!-- FORM MESSAGE -->
 
                     <p
                         id="service-form-message"
@@ -1018,9 +664,6 @@
                         role="status"
                         aria-live="polite"
                     ></p>
-
-
-                    <!-- FORM ACTIONS -->
 
                     <div class="service-form-actions">
 
@@ -1046,34 +689,23 @@
 
             </div>
 
-
-            <!-- EXISTING SERVICES -->
-
             <div class="services-list-section">
 
                 <div class="services-list-heading">
-
-                    <h3>
-                        Service List
-                    </h3>
-
+                    <h3>Service List</h3>
                     <p>
                         Review service names, vehicle types, prices and status.
                     </p>
-
                 </div>
-
 
                 <div
                     id="services-list"
                     class="services-list"
                     aria-live="polite"
                 >
-
                     <div class="services-loading">
                         Services will appear here when the database is connected.
                     </div>
-
                 </div>
 
             </div>
@@ -1081,46 +713,32 @@
         </section>
 
 
-        <!-- =================================================
-             RECENT TRANSACTIONS
-        ================================================== -->
+        <!-- RECENT TRANSACTIONS -->
 
         <section class="activity-section">
 
             <div class="section-heading">
-
                 <div>
-
-                    <h2>
-                        Recent Transactions
-                    </h2>
-
-                    <p>
-                        Your latest recorded car wash services.
-                    </p>
-
+                    <h2>Recent Transactions</h2>
+                    <p>Your latest recorded car wash services.</p>
                 </div>
-
             </div>
 
-
             <div id="recent-transactions-list">
-    <div class="empty-state">
-        <div>🧾</div>
-        <h3>No transactions yet</h3>
-        <p>
-            Customer and payment records will appear here
-            once a real transaction has been recorded.
-        </p>
-    </div>
-</div>
+                <div class="empty-state">
+                    <div>🧾</div>
+                    <h3>No transactions yet</h3>
+                    <p>
+                        Customer and payment records will appear here
+                        once a real transaction has been recorded.
+                    </p>
+                </div>
+            </div>
 
         </section>
 
 
-        <!-- =================================================
-             FOOTER
-        ================================================== -->
+        <!-- FOOTER -->
 
         <footer class="app-footer">
 
@@ -1130,18 +748,14 @@
                 Car Wash by Global Line Services (GLS)
             </p>
 
-            <p>
-                Management System
-            </p>
+            <p>Management System</p>
 
         </footer>
 
     </main>
 
 
-    <!-- =================================================
-         JAVASCRIPT LIBRARIES
-    ================================================== -->
+    <!-- JAVASCRIPT LIBRARIES -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js?v=8"></script>
