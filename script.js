@@ -13,7 +13,7 @@ const GLS_SUPABASE_URL =
     "https://pvbfsrelqruxluhtqddh.supabase.co";
 
 const GLS_SUPABASE_PUBLISHABLE_KEY =
-    "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+    "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk";
 
 
 /* =====================================================
