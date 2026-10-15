@@ -5,10 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="theme-color"
-        content="#14283f"
-    >
+    <meta name="theme-color" content="#14283f">
 
     <meta
         name="description"
@@ -22,9 +19,9 @@
 
 <body>
 
-    <!-- =========================================
+    <!-- =================================================
          HEADER
-    ========================================== -->
+    ================================================== -->
 
     <header class="app-header">
 
@@ -63,9 +60,9 @@
     </header>
 
 
-    <!-- =========================================
+    <!-- =================================================
          LOGIN SCREEN
-    ========================================== -->
+    ================================================== -->
 
     <section
         id="login-screen"
@@ -88,9 +85,6 @@
                 Sign in to GLS Car Wash Management System.
             </p>
 
-
-            <!-- LOGIN FORM -->
-
             <form id="login-form">
 
                 <label for="login-email">
@@ -108,7 +102,6 @@
                     required
                 >
 
-
                 <label for="login-password">
                     Password
                 </label>
@@ -122,14 +115,12 @@
                     required
                 >
 
-
                 <p
                     id="login-message"
                     class="login-message"
                     role="alert"
                     aria-live="polite"
                 ></p>
-
 
                 <button
                     id="login-submit"
@@ -141,7 +132,6 @@
 
             </form>
 
-
             <p class="login-footer">
                 Authorized personnel only.
             </p>
@@ -151,109 +141,116 @@
     </section>
 
 
-    <!-- =========================================
-         MAIN DASHBOARD
+    <!-- =================================================
+         PASSWORD RESET SCREEN
 
-         Hidden until JavaScript verifies that
-         the user is signed in and authorized.
-    ========================================== -->
+         IMPORTANT:
+         Keep this outside the hidden dashboard.
+    ================================================== -->
 
-    <main
-        class="dashboard"
-        id="dashboard"
+    <section
+        id="password-reset-screen"
+        class="login-section"
         hidden
     >
 
-        <!-- =========================================
-     RESET PASSWORD SCREEN
-========================================== -->
+        <div class="login-card">
 
-<section
-    id="password-reset-screen"
-    class="login-section"
-    hidden
->
-    <div class="login-card">
+            <div class="login-brand">
+                GLS
+            </div>
 
-        <div class="login-brand">
-            GLS
-        </div>
+            <p class="eyebrow">
+                GLOBAL LINE SERVICES
+            </p>
 
-        <p class="eyebrow">
-            GLOBAL LINE SERVICES
-        </p>
+            <h2>Reset Password</h2>
 
-        <h2>Reset Password</h2>
+            <p class="login-description">
+                Create a new password for your GLS account.
+            </p>
 
-        <p class="login-description">
-            Create a new password for your GLS account.
-        </p>
+            <form id="password-reset-form">
 
-        <form id="password-reset-form">
+                <label for="new-password">
+                    New Password
+                </label>
 
-            <label for="new-password">
-                New Password
-            </label>
+                <input
+                    type="password"
+                    id="new-password"
+                    name="new-password"
+                    placeholder="Enter your new password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required
+                >
 
-            <input
-                type="password"
-                id="new-password"
-                name="new-password"
-                placeholder="Enter your new password"
-                autocomplete="new-password"
-                minlength="8"
-                required
-            >
+                <label for="confirm-new-password">
+                    Confirm New Password
+                </label>
 
-            <label for="confirm-new-password">
-                Confirm New Password
-            </label>
+                <input
+                    type="password"
+                    id="confirm-new-password"
+                    name="confirm-new-password"
+                    placeholder="Re-enter your new password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required
+                >
 
-            <input
-                type="password"
-                id="confirm-new-password"
-                name="confirm-new-password"
-                placeholder="Re-enter your new password"
-                autocomplete="new-password"
-                minlength="8"
-                required
-            >
+                <p
+                    id="password-reset-message"
+                    class="login-message"
+                    role="alert"
+                    aria-live="polite"
+                ></p>
 
-            <p
-                id="password-reset-message"
-                class="login-message"
-                role="alert"
-                aria-live="polite"
-            ></p>
+                <button
+                    id="password-reset-submit"
+                    class="login-button"
+                    type="submit"
+                >
+                    Update Password
+                </button>
+
+            </form>
 
             <button
-                id="password-reset-submit"
-                class="login-button"
-                type="submit"
+                id="back-to-login"
+                class="reset-back-button"
+                type="button"
             >
-                Update Password
+                Back to Sign In
             </button>
 
-        </form>
+            <p class="login-footer">
+                Keep your password private.
+            </p>
 
-        <button
-            id="back-to-login"
-            class="reset-back-button"
-            type="button"
-        >
-            Back to Sign In
-        </button>
+        </div>
 
-        <p class="login-footer">
-            Keep your password private.
-        </p>
+    </section>
 
-    </div>
-</section>
 
-<!-- END RESET PASSWORD SCREEN -->
+    <!-- =================================================
+         MAIN DASHBOARD
 
-        <!-- WELCOME SECTION -->
+         Hidden until JavaScript verifies the user's
+         Supabase session and active GLS profile.
+    ================================================== -->
+
+    <main
+        id="dashboard"
+        class="dashboard"
+        hidden
+    >
+
+
+        <!-- =================================================
+             WELCOME SECTION
+        ================================================== -->
 
         <section class="welcome-section">
 
@@ -271,7 +268,6 @@
 
             </div>
 
-
             <div class="date-card">
 
                 <span>
@@ -287,9 +283,9 @@
         </section>
 
 
-        <!-- =====================================
-             DAILY SUMMARY CARDS
-        ====================================== -->
+        <!-- =================================================
+             DAILY SUMMARY
+        ================================================== -->
 
         <section class="summary-grid">
 
@@ -365,9 +361,9 @@
         </section>
 
 
-        <!-- =====================================
+        <!-- =================================================
              QUICK ACTIONS
-        ====================================== -->
+        ================================================== -->
 
         <section class="action-section">
 
@@ -395,6 +391,7 @@
 
                 <button
                     class="action-card"
+                    id="new-customer-action"
                     type="button"
                     onclick="showNotice('New Customer')"
                 >
@@ -418,6 +415,7 @@
 
                 <button
                     class="action-card"
+                    id="record-payment-action"
                     type="button"
                     onclick="showNotice('Record Payment')"
                 >
@@ -441,6 +439,7 @@
 
                 <button
                     class="action-card"
+                    id="customer-records-action"
                     type="button"
                     onclick="showNotice('Customer Records')"
                 >
@@ -464,6 +463,7 @@
 
                 <button
                     class="action-card"
+                    id="reports-action"
                     type="button"
                     onclick="showNotice('Reports')"
                 >
@@ -482,14 +482,281 @@
 
                 </button>
 
+
+                <!-- ADMIN: MANAGE SERVICES -->
+
+                <button
+                    class="action-card"
+                    id="manage-services-action"
+                    type="button"
+                    onclick="showNotice('Manage Services & Pricing')"
+                    hidden
+                >
+
+                    <span class="action-icon">
+                        🧽
+                    </span>
+
+                    <span class="action-title">
+                        Manage Services & Pricing
+                    </span>
+
+                    <span class="action-description">
+                        Add services, update prices and manage availability.
+                    </span>
+
+                </button>
+
             </div>
 
         </section>
 
 
-        <!-- =====================================
+        <!-- =================================================
+             SERVICES AND PRICING MANAGEMENT
+
+             The panel will be connected to Supabase
+             in the next JavaScript update.
+        ================================================== -->
+
+        <section
+            class="activity-section services-management-section"
+            id="services-management-section"
+            hidden
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Services & Pricing
+                    </h2>
+
+                    <p>
+                        Manage car wash services and prices in RM.
+                    </p>
+
+                </div>
+
+                <button
+                    id="close-services-panel"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Close
+                </button>
+
+            </div>
+
+
+            <!-- SERVICE FORM -->
+
+            <div class="service-form-card">
+
+                <h3 id="service-form-heading">
+                    Add New Service
+                </h3>
+
+                <p class="service-form-description">
+                    Enter the service details below.
+                </p>
+
+
+                <form id="service-form">
+
+                    <input
+                        type="hidden"
+                        id="service-id"
+                    >
+
+                    <div class="service-form-grid">
+
+
+                        <!-- SERVICE NAME -->
+
+                        <div class="form-field">
+
+                            <label for="service-name">
+                                Service Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="service-name"
+                                name="service-name"
+                                placeholder="e.g. Normal Wash"
+                                maxlength="100"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- VEHICLE TYPE -->
+
+                        <div class="form-field">
+
+                            <label for="service-vehicle-type">
+                                Vehicle Type
+                            </label>
+
+                            <select
+                                id="service-vehicle-type"
+                                name="vehicle-type"
+                                required
+                            >
+
+                                <option value="">
+                                    Select vehicle type
+                                </option>
+
+                                <option value="Car">
+                                    Car
+                                </option>
+
+                                <option value="SUV/MPV">
+                                    SUV / MPV
+                                </option>
+
+                                <option value="4x4">
+                                    4x4
+                                </option>
+
+                                <option value="Motorcycle">
+                                    Motorcycle
+                                </option>
+
+                                <option value="Van">
+                                    Van
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- SERVICE PRICE -->
+
+                        <div class="form-field">
+
+                            <label for="service-price">
+                                Price (RM)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="service-price"
+                                name="price"
+                                placeholder="0.00"
+                                min="0.01"
+                                max="9999999.99"
+                                step="0.01"
+                                inputmode="decimal"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SERVICE STATUS -->
+
+                    <label class="service-active-label">
+
+                        <input
+                            type="checkbox"
+                            id="service-active"
+                            name="service-active"
+                            checked
+                        >
+
+                        <span>
+                            Service is active and available
+                        </span>
+
+                    </label>
+
+
+                    <!-- FORM MESSAGE -->
+
+                    <p
+                        id="service-form-message"
+                        class="service-form-message"
+                        role="status"
+                        aria-live="polite"
+                    ></p>
+
+
+                    <!-- FORM ACTIONS -->
+
+                    <div class="service-form-actions">
+
+                        <button
+                            type="submit"
+                            id="service-save-button"
+                            class="primary-button"
+                        >
+                            Save Service
+                        </button>
+
+                        <button
+                            type="button"
+                            id="service-clear-button"
+                            class="secondary-button"
+                        >
+                            Clear Form
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- EXISTING SERVICES -->
+
+            <div class="services-list-section">
+
+                <div class="services-list-heading">
+
+                    <h3>
+                        Service List
+                    </h3>
+
+                    <p>
+                        Review service names, vehicle types, prices and status.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="services-list"
+                    class="services-list"
+                    aria-live="polite"
+                >
+
+                    <div class="services-loading">
+                        Services will appear here when the database is connected.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
              RECENT TRANSACTIONS
-        ====================================== -->
+        ================================================== -->
 
         <section class="activity-section">
 
@@ -530,9 +797,9 @@
         </section>
 
 
-        <!-- =====================================
+        <!-- =================================================
              FOOTER
-        ====================================== -->
+        ================================================== -->
 
         <footer class="app-footer">
 
@@ -551,13 +818,12 @@
     </main>
 
 
-    <!-- =========================================
+    <!-- =================================================
          JAVASCRIPT LIBRARIES
-
-         Supabase JavaScript SDK v2
-    ========================================== -->
+    ================================================== -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script src="script.js?v=3"></script>
 
 </body>
