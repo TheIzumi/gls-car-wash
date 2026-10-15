@@ -1,6 +1,6 @@
 /* =====================================================
    GLS CAR WASH MANAGEMENT SYSTEM
-   Authentication and Password Recovery
+   Authentication, Password Recovery and Services
 ===================================================== */
 
 "use strict";
@@ -27,6 +27,8 @@ let glsSupabase = null;
 let currentProfile = null;
 let loginInProgress = false;
 let passwordUpdateInProgress = false;
+let serviceSaveInProgress = false;
+let servicesLoading = false;
 
 const initialHashParams = new URLSearchParams(
     window.location.hash.replace(/^#/, "")
@@ -63,7 +65,6 @@ const loginMessage =
 const loginSubmit =
     document.getElementById("login-submit");
 
-
 const passwordResetScreen =
     document.getElementById("password-reset-screen");
 
@@ -85,7 +86,6 @@ const passwordResetSubmit =
 const backToLoginButton =
     document.getElementById("back-to-login");
 
-
 const dashboard =
     document.getElementById("dashboard");
 
@@ -96,6 +96,51 @@ const logoutButton =
     document.getElementById("logout-button");
 
 
+/* Services management elements */
+
+const manageServicesAction =
+    document.getElementById("manage-services-action");
+
+const servicesManagementSection =
+    document.getElementById("services-management-section");
+
+const closeServicesPanel =
+    document.getElementById("close-services-panel");
+
+const serviceForm =
+    document.getElementById("service-form");
+
+const serviceIdInput =
+    document.getElementById("service-id");
+
+const serviceNameInput =
+    document.getElementById("service-name");
+
+const serviceVehicleTypeInput =
+    document.getElementById("service-vehicle-type");
+
+const servicePriceInput =
+    document.getElementById("service-price");
+
+const serviceActiveInput =
+    document.getElementById("service-active");
+
+const serviceFormHeading =
+    document.getElementById("service-form-heading");
+
+const serviceFormMessage =
+    document.getElementById("service-form-message");
+
+const serviceSaveButton =
+    document.getElementById("service-save-button");
+
+const serviceClearButton =
+    document.getElementById("service-clear-button");
+
+const servicesList =
+    document.getElementById("services-list");
+
+
 /* =====================================================
    4. DATE AND YEAR
 ===================================================== */
@@ -104,9 +149,7 @@ function updateCurrentDate() {
     const element =
         document.getElementById("current-date");
 
-    if (!element) {
-        return;
-    }
+    if (!element) return;
 
     element.textContent = new Intl.DateTimeFormat(
         "en-GB",
@@ -125,9 +168,7 @@ function updateCurrentYear() {
     const element =
         document.getElementById("current-year");
 
-    if (!element) {
-        return;
-    }
+    if (!element) return;
 
     element.textContent = new Intl.DateTimeFormat(
         "en",
@@ -139,17 +180,26 @@ function updateCurrentYear() {
 }
 
 
+function formatRM(value) {
+    return new Intl.NumberFormat(
+        "en-MY",
+        {
+            style: "currency",
+            currency: "MYR"
+        }
+    ).format(Number(value));
+}
+
+
 /* =====================================================
-   5. LOGIN MESSAGES
+   5. LOGIN AND RESET MESSAGES
 ===================================================== */
 
 function setLoginMessage(
     message,
     type = "error"
 ) {
-    if (!loginMessage) {
-        return;
-    }
+    if (!loginMessage) return;
 
     loginMessage.textContent = message;
     loginMessage.className = "login-message";
@@ -166,9 +216,7 @@ function setPasswordResetMessage(
     message,
     type = "error"
 ) {
-    if (!passwordResetMessage) {
-        return;
-    }
+    if (!passwordResetMessage) return;
 
     passwordResetMessage.textContent = message;
     passwordResetMessage.className = "login-message";
@@ -177,6 +225,23 @@ function setPasswordResetMessage(
         passwordResetMessage.classList.add("success");
     } else if (type === "info") {
         passwordResetMessage.classList.add("info");
+    }
+}
+
+
+function setServiceFormMessage(
+    message,
+    type = "error"
+) {
+    if (!serviceFormMessage) return;
+
+    serviceFormMessage.textContent = message;
+    serviceFormMessage.className = "service-form-message";
+
+    if (type === "success") {
+        serviceFormMessage.classList.add("success");
+    } else if (type === "info") {
+        serviceFormMessage.classList.add("info");
     }
 }
 
@@ -203,6 +268,14 @@ function showLoginScreen(
         dashboard.hidden = true;
     }
 
+    if (servicesManagementSection) {
+        servicesManagementSection.hidden = true;
+    }
+
+    if (manageServicesAction) {
+        manageServicesAction.hidden = true;
+    }
+
     if (authStatus) {
         authStatus.textContent = "Please sign in";
     }
@@ -218,7 +291,7 @@ function showLoginScreen(
 
 
 /* =====================================================
-   7. SHOW PASSWORD RESET SCREEN
+   7. PASSWORD RESET SCREEN
 ===================================================== */
 
 function showPasswordResetScreen() {
@@ -284,6 +357,20 @@ function showDashboard(profile) {
         dashboard.hidden = false;
     }
 
+    /*
+     * The services-management button is visible only
+     * to an Admin. Database RLS remains authoritative.
+     */
+
+    if (manageServicesAction) {
+        manageServicesAction.hidden =
+            profile.role !== "admin";
+    }
+
+    if (servicesManagementSection) {
+        servicesManagementSection.hidden = true;
+    }
+
     if (authStatus) {
         const name = profile.full_name || "GLS User";
 
@@ -313,7 +400,7 @@ function showDashboard(profile) {
 
 
 /* =====================================================
-   9. VERIFY AUTHENTICATED USER PROFILE
+   9. VERIFY USER PROFILE
 ===================================================== */
 
 async function verifyAndDisplayUser(session) {
@@ -397,7 +484,6 @@ async function handleLogin(event) {
         setLoginMessage(
             "Enter your email address and password."
         );
-
         return;
     }
 
@@ -436,7 +522,6 @@ async function handleLogin(event) {
             setLoginMessage(
                 "No active session was created."
             );
-
             return;
         }
 
@@ -461,23 +546,20 @@ async function handleLogin(event) {
 
 
 /* =====================================================
-   11. RESET PASSWORD
+   11. PASSWORD RESET
 ===================================================== */
 
 async function handlePasswordReset(event) {
     event.preventDefault();
 
-    if (
-        !glsSupabase ||
-        !passwordRecoveryMode ||
-        passwordUpdateInProgress
-    ) {
+    if (!glsSupabase || !passwordRecoveryMode) {
         setPasswordResetMessage(
             "Open a valid password recovery link from your email first."
         );
-
         return;
     }
+
+    if (passwordUpdateInProgress) return;
 
     const password = newPasswordInput.value;
     const confirmation = confirmNewPasswordInput.value;
@@ -486,7 +568,6 @@ async function handlePasswordReset(event) {
         setPasswordResetMessage(
             "Your password must contain at least 8 characters."
         );
-
         return;
     }
 
@@ -494,7 +575,6 @@ async function handlePasswordReset(event) {
         setPasswordResetMessage(
             "The passwords do not match."
         );
-
         return;
     }
 
@@ -521,7 +601,7 @@ async function handlePasswordReset(event) {
             );
 
             setPasswordResetMessage(
-                "Unable to update the password. The recovery link may have expired. Request a new link and try again."
+                "Unable to update the password. The recovery link may have expired."
             );
 
             return;
@@ -545,16 +625,15 @@ async function handlePasswordReset(event) {
             );
         }
 
-        showLoginScreen(
-            "Password updated successfully. Sign in with your new password.",
-            "success"
-        );
-
-        // Remove recovery tokens from the visible URL.
         window.history.replaceState(
             {},
             document.title,
             window.location.pathname
+        );
+
+        showLoginScreen(
+            "Password updated successfully. Sign in with your new password.",
+            "success"
         );
 
     } catch (error) {
@@ -581,9 +660,7 @@ async function handlePasswordReset(event) {
 
 async function handleBackToLogin() {
     if (glsSupabase) {
-        const {
-            error
-        } = await glsSupabase.auth.signOut({
+        const { error } = await glsSupabase.auth.signOut({
             scope: "local"
         });
 
@@ -619,9 +696,7 @@ async function handleLogout() {
     logoutButton.disabled = true;
     logoutButton.textContent = "Signing Out...";
 
-    const {
-        error
-    } = await glsSupabase.auth.signOut({
+    const { error } = await glsSupabase.auth.signOut({
         scope: "local"
     });
 
@@ -635,7 +710,6 @@ async function handleLogout() {
         logoutButton.textContent = "Log Out";
 
         alert("Unable to sign out. Please try again.");
-
         return;
     }
 
@@ -649,7 +723,395 @@ async function handleLogout() {
 
 
 /* =====================================================
-   14. DASHBOARD PLACEHOLDER BUTTONS
+   14. SERVICES MANAGEMENT — FORM HELPERS
+===================================================== */
+
+function clearServiceForm() {
+    if (!serviceForm) return;
+
+    serviceForm.reset();
+
+    serviceIdInput.value = "";
+    serviceActiveInput.checked = true;
+
+    serviceFormHeading.textContent = "Add New Service";
+    serviceSaveButton.textContent = "Save Service";
+
+    setServiceFormMessage("");
+}
+
+
+function setServiceFormBusy(isBusy) {
+    serviceSaveButton.disabled = isBusy;
+    serviceClearButton.disabled = isBusy;
+
+    serviceSaveButton.textContent = isBusy
+        ? "Saving..."
+        : (
+            serviceIdInput.value
+                ? "Update Service"
+                : "Save Service"
+        );
+}
+
+
+/* =====================================================
+   15. SERVICES MANAGEMENT — RENDER LIST
+===================================================== */
+
+function renderServices(serviceRows) {
+    if (!servicesList) return;
+
+    servicesList.replaceChildren();
+
+    if (!serviceRows || serviceRows.length === 0) {
+        const empty = document.createElement("div");
+
+        empty.className = "services-loading";
+        empty.textContent =
+            "No services have been configured yet. Use the form above to add the first service.";
+
+        servicesList.appendChild(empty);
+        return;
+    }
+
+    serviceRows.forEach((service) => {
+        const card = document.createElement("article");
+        card.className = "service-item";
+
+        const information = document.createElement("div");
+        information.className = "service-item-information";
+
+        const title = document.createElement("h4");
+        title.className = "service-item-name";
+        title.textContent = service.name;
+
+        const vehicle = document.createElement("p");
+        vehicle.className = "service-item-vehicle";
+        vehicle.textContent = service.vehicle_type;
+
+        const price = document.createElement("p");
+        price.className = "service-item-price";
+        price.textContent = formatRM(service.price);
+
+        const status = document.createElement("span");
+        status.className = service.is_active
+            ? "service-status service-status-active"
+            : "service-status service-status-inactive";
+
+        status.textContent = service.is_active
+            ? "Active"
+            : "Inactive";
+
+        information.appendChild(title);
+        information.appendChild(vehicle);
+        information.appendChild(price);
+        information.appendChild(status);
+
+        const editButton = document.createElement("button");
+
+        editButton.type = "button";
+        editButton.className = "secondary-button";
+        editButton.textContent = "Edit";
+
+        editButton.addEventListener("click", () => {
+            editService(service);
+        });
+
+        card.appendChild(information);
+        card.appendChild(editButton);
+
+        servicesList.appendChild(card);
+    });
+}
+
+
+/* =====================================================
+   16. SERVICES MANAGEMENT — LOAD FROM SUPABASE
+===================================================== */
+
+async function loadServices() {
+    if (!glsSupabase || !currentProfile) {
+        return;
+    }
+
+    if (currentProfile.role !== "admin") {
+        setServiceFormMessage(
+            "Only an Admin can manage service names and prices."
+        );
+        return;
+    }
+
+    if (servicesLoading) return;
+
+    servicesLoading = true;
+
+    if (servicesList) {
+        servicesList.replaceChildren();
+
+        const loading = document.createElement("div");
+        loading.className = "services-loading";
+        loading.textContent = "Loading services from Supabase...";
+
+        servicesList.appendChild(loading);
+    }
+
+    try {
+        const {
+            data,
+            error
+        } = await glsSupabase
+            .from("services")
+            .select(
+                "id, name, vehicle_type, price, is_active, created_at, updated_at"
+            )
+            .order("name", { ascending: true });
+
+        if (error) {
+            console.error(
+                "GLS service loading failed:",
+                error.message
+            );
+
+            renderServices([]);
+
+            setServiceFormMessage(
+                "Unable to load services. Check your Admin access and database policies."
+            );
+
+            return;
+        }
+
+        renderServices(data || []);
+
+        setServiceFormMessage(
+            `${(data || []).length} service(s) loaded.`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Unexpected GLS service loading error:",
+            error
+        );
+
+        renderServices([]);
+
+        setServiceFormMessage(
+            "An unexpected error occurred while loading services."
+        );
+
+    } finally {
+        servicesLoading = false;
+    }
+}
+
+
+/* =====================================================
+   17. SERVICES MANAGEMENT — OPEN AND CLOSE PANEL
+===================================================== */
+
+async function openServicesPanel() {
+    if (!currentProfile || currentProfile.role !== "admin") {
+        alert("Only an Admin can manage services and pricing.");
+        return;
+    }
+
+    if (!servicesManagementSection) return;
+
+    servicesManagementSection.hidden = false;
+
+    servicesManagementSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    clearServiceForm();
+
+    await loadServices();
+}
+
+
+function closeServicesPanelHandler() {
+    if (servicesManagementSection) {
+        servicesManagementSection.hidden = true;
+    }
+
+    clearServiceForm();
+}
+
+
+/* =====================================================
+   18. SERVICES MANAGEMENT — EDIT SERVICE
+===================================================== */
+
+function editService(service) {
+    if (!currentProfile || currentProfile.role !== "admin") {
+        alert("Only an Admin can edit services.");
+        return;
+    }
+
+    serviceIdInput.value = service.id;
+    serviceNameInput.value = service.name;
+    serviceVehicleTypeInput.value = service.vehicle_type;
+    servicePriceInput.value = Number(service.price).toFixed(2);
+    serviceActiveInput.checked = service.is_active;
+
+    serviceFormHeading.textContent = "Edit Service";
+    serviceSaveButton.textContent = "Update Service";
+
+    setServiceFormMessage(
+        "Edit the details and save your changes.",
+        "info"
+    );
+
+    serviceForm.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+    serviceNameInput.focus();
+}
+
+
+/* =====================================================
+   19. SERVICES MANAGEMENT — SAVE SERVICE
+===================================================== */
+
+async function handleServiceSave(event) {
+    event.preventDefault();
+
+    if (!glsSupabase || !currentProfile) {
+        setServiceFormMessage(
+            "Please sign in first."
+        );
+        return;
+    }
+
+    if (currentProfile.role !== "admin") {
+        setServiceFormMessage(
+            "Only an Admin can add or change services."
+        );
+        return;
+    }
+
+    if (serviceSaveInProgress) return;
+
+    const name = serviceNameInput.value.trim();
+    const vehicleType = serviceVehicleTypeInput.value;
+    const price = Number(servicePriceInput.value);
+    const isActive = serviceActiveInput.checked;
+    const serviceId = serviceIdInput.value.trim();
+
+    if (!name) {
+        setServiceFormMessage(
+            "Enter a service name."
+        );
+        serviceNameInput.focus();
+        return;
+    }
+
+    if (!vehicleType) {
+        setServiceFormMessage(
+            "Select a vehicle type."
+        );
+        serviceVehicleTypeInput.focus();
+        return;
+    }
+
+    if (
+        !Number.isFinite(price) ||
+        price <= 0 ||
+        price > 9999999.99
+    ) {
+        setServiceFormMessage(
+            "Enter a valid price greater than RM 0.00."
+        );
+        servicePriceInput.focus();
+        return;
+    }
+
+    const serviceData = {
+        name,
+        vehicle_type: vehicleType,
+        price: Number(price.toFixed(2)),
+        is_active: isActive
+    };
+
+    serviceSaveInProgress = true;
+    setServiceFormBusy(true);
+
+    setServiceFormMessage(
+        "Saving service to the database...",
+        "info"
+    );
+
+    try {
+        let result;
+
+        if (serviceId) {
+            result = await glsSupabase
+                .from("services")
+                .update(serviceData)
+                .eq("id", serviceId)
+                .select(
+                    "id, name, vehicle_type, price, is_active"
+                )
+                .single();
+
+        } else {
+            result = await glsSupabase
+                .from("services")
+                .insert(serviceData)
+                .select(
+                    "id, name, vehicle_type, price, is_active"
+                )
+                .single();
+        }
+
+        if (result.error) {
+            console.error(
+                "GLS service save failed:",
+                result.error.message
+            );
+
+            setServiceFormMessage(
+                "The service could not be saved. Confirm that you are logged in as Admin and that the database permissions allow this action."
+            );
+
+            return;
+        }
+
+        clearServiceForm();
+
+        setServiceFormMessage(
+            serviceId
+                ? "Service updated successfully."
+                : "Service added successfully.",
+            "success"
+        );
+
+        await loadServices();
+
+    } catch (error) {
+        console.error(
+            "Unexpected GLS service save error:",
+            error
+        );
+
+        setServiceFormMessage(
+            "An unexpected error occurred. Please try again."
+        );
+
+    } finally {
+        serviceSaveInProgress = false;
+        setServiceFormBusy(false);
+    }
+}
+
+
+/* =====================================================
+   20. DASHBOARD QUICK ACTIONS
 ===================================================== */
 
 function showNotice(feature) {
@@ -657,7 +1119,11 @@ function showNotice(feature) {
         showLoginScreen(
             "Please sign in before accessing the system."
         );
+        return;
+    }
 
+    if (feature === "Manage Services & Pricing") {
+        openServicesPanel();
         return;
     }
 
@@ -683,7 +1149,7 @@ function showNotice(feature) {
 
 
 /* =====================================================
-   15. INITIALISE APPLICATION
+   21. INITIALISE APPLICATION
 ===================================================== */
 
 async function initialiseGLS() {
@@ -708,16 +1174,33 @@ async function initialiseGLS() {
         backToLoginButton,
         dashboard,
         authStatus,
-        logoutButton
+        logoutButton,
+        manageServicesAction,
+        servicesManagementSection,
+        closeServicesPanel,
+        serviceForm,
+        serviceIdInput,
+        serviceNameInput,
+        serviceVehicleTypeInput,
+        servicePriceInput,
+        serviceActiveInput,
+        serviceFormHeading,
+        serviceFormMessage,
+        serviceSaveButton,
+        serviceClearButton,
+        servicesList
     ];
 
     if (requiredElements.some(element => !element)) {
         console.error(
-            "GLS initialisation failed: required HTML elements are missing."
+            "GLS initialisation failed: one or more required HTML elements are missing."
         );
 
         return;
     }
+
+
+    /* Verify that the Supabase library loaded. */
 
     if (
         !window.supabase ||
@@ -731,12 +1214,7 @@ async function initialiseGLS() {
     }
 
 
-    /*
-     * CORRECT KEY VALIDATION
-     *
-     * Do not compare the key with itself.
-     * Check only whether it is empty or still a placeholder.
-     */
+    /* Validate the Publishable Key. */
 
     if (
         !GLS_SUPABASE_PUBLISHABLE_KEY ||
@@ -752,7 +1230,7 @@ async function initialiseGLS() {
     }
 
 
-    /* Create Supabase client */
+    /* Create the Supabase client. */
 
     glsSupabase = window.supabase.createClient(
         GLS_SUPABASE_URL,
@@ -767,7 +1245,7 @@ async function initialiseGLS() {
     );
 
 
-    /* Register event handlers */
+    /* Register authentication forms. */
 
     loginForm.addEventListener(
         "submit",
@@ -790,7 +1268,25 @@ async function initialiseGLS() {
     );
 
 
-    /* Handle authentication state changes */
+    /* Register service management forms. */
+
+    serviceForm.addEventListener(
+        "submit",
+        handleServiceSave
+    );
+
+    serviceClearButton.addEventListener(
+        "click",
+        clearServiceForm
+    );
+
+    closeServicesPanel.addEventListener(
+        "click",
+        closeServicesPanelHandler
+    );
+
+
+    /* Handle Supabase authentication events. */
 
     glsSupabase.auth.onAuthStateChange(
         (event) => {
@@ -808,7 +1304,7 @@ async function initialiseGLS() {
     );
 
 
-    /* Restore an existing session */
+    /* Restore an existing session, if available. */
 
     try {
         const {
@@ -836,7 +1332,6 @@ async function initialiseGLS() {
 
         if (data.session) {
             await verifyAndDisplayUser(data.session);
-
         } else {
             showLoginScreen();
         }
@@ -855,7 +1350,7 @@ async function initialiseGLS() {
 
 
 /* =====================================================
-   16. START APPLICATION
+   22. START APPLICATION
 ===================================================== */
 
 if (document.readyState === "loading") {
