@@ -1031,3 +1031,45 @@ input:focus-visible {
     }
 
 }
+
+/* =========================================
+   GLS PASSWORD RESET SCREEN
+========================================= */
+
+.reset-back-button {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    margin-top: 12px;
+    padding: 10px 16px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    background: var(--white);
+    color: var(--navy);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.reset-back-button:hover {
+    background: var(--background);
+    border-color: var(--green);
+}
+
+.reset-back-button:focus-visible {
+    outline: 3px solid rgba(22, 160, 133, 0.35);
+    outline-offset: 3px;
+}
+
+.reset-back-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
