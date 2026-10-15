@@ -1,6 +1,6 @@
 /* =====================================================
    GLS CAR WASH MANAGEMENT SYSTEM
-   Authentication, Services and Customer Registration
+   Authentication, Services, Customers and Payments
 ===================================================== */
 
 "use strict";
@@ -30,8 +30,11 @@ let loginInProgress = false;
 let passwordUpdateInProgress = false;
 let serviceSaveInProgress = false;
 let customerSaveInProgress = false;
+let paymentSaveInProgress = false;
 
 let servicesLoading = false;
+let paymentsLoading = false;
+
 let activeServicesForVehicle = [];
 
 const initialHashParams = new URLSearchParams(
@@ -111,7 +114,7 @@ const logoutButton =
 
 
 /* =====================================================
-   6. PAGE ELEMENTS — SERVICES MANAGEMENT
+   6. PAGE ELEMENTS — SERVICES
 ===================================================== */
 
 const manageServicesAction =
@@ -199,7 +202,27 @@ const customerClearButton =
 
 
 /* =====================================================
-   8. DATE, YEAR AND CURRENCY
+   8. PAGE ELEMENTS — PAYMENT
+===================================================== */
+
+const paymentManagementSection =
+    document.getElementById("payment-management-section");
+
+const closePaymentPanel =
+    document.getElementById("close-payment-panel");
+
+const refreshPaymentListButton =
+    document.getElementById("refresh-payment-list");
+
+const paymentFormMessage =
+    document.getElementById("payment-form-message");
+
+const unpaidTransactionsList =
+    document.getElementById("unpaid-transactions-list");
+
+
+/* =====================================================
+   9. DATE AND CURRENCY HELPERS
 ===================================================== */
 
 function updateCurrentDate() {
@@ -248,8 +271,32 @@ function formatRM(value) {
 }
 
 
+function formatMalaysiaDateTime(value) {
+    if (!value) return "Date unavailable";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Date unavailable";
+    }
+
+    return new Intl.DateTimeFormat(
+        "en-MY",
+        {
+            timeZone: GLS_TIMEZONE,
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        }
+    ).format(date);
+}
+
+
 /* =====================================================
-   9. STATUS MESSAGES
+   10. STATUS MESSAGES
 ===================================================== */
 
 function setLoginMessage(message, type = "error") {
@@ -308,8 +355,22 @@ function setCustomerFormMessage(message, type = "error") {
 }
 
 
+function setPaymentFormMessage(message, type = "error") {
+    if (!paymentFormMessage) return;
+
+    paymentFormMessage.textContent = message;
+    paymentFormMessage.className = "service-form-message";
+
+    if (type === "success") {
+        paymentFormMessage.classList.add("success");
+    } else if (type === "info") {
+        paymentFormMessage.classList.add("info");
+    }
+}
+
+
 /* =====================================================
-   10. SCREEN MANAGEMENT
+   11. SHOW LOGIN SCREEN
 ===================================================== */
 
 function showLoginScreen(message = "", type = "error") {
@@ -319,14 +380,21 @@ function showLoginScreen(message = "", type = "error") {
     if (loginScreen) loginScreen.hidden = false;
     if (passwordResetScreen) passwordResetScreen.hidden = true;
     if (dashboard) dashboard.hidden = true;
+
+    if (manageServicesAction) {
+        manageServicesAction.hidden = true;
+    }
+
     if (servicesManagementSection) {
         servicesManagementSection.hidden = true;
     }
+
     if (newCustomerSection) {
         newCustomerSection.hidden = true;
     }
-    if (manageServicesAction) {
-        manageServicesAction.hidden = true;
+
+    if (paymentManagementSection) {
+        paymentManagementSection.hidden = true;
     }
 
     if (authStatus) {
@@ -343,12 +411,17 @@ function showLoginScreen(message = "", type = "error") {
 }
 
 
+/* =====================================================
+   12. PASSWORD RESET SCREEN
+===================================================== */
+
 function showPasswordResetScreen() {
     passwordRecoveryMode = true;
     currentProfile = null;
 
     if (loginScreen) loginScreen.hidden = true;
     if (dashboard) dashboard.hidden = true;
+
     if (passwordResetScreen) {
         passwordResetScreen.hidden = false;
     }
@@ -357,7 +430,9 @@ function showPasswordResetScreen() {
         authStatus.textContent = "Reset Password";
     }
 
-    if (logoutButton) logoutButton.hidden = true;
+    if (logoutButton) {
+        logoutButton.hidden = true;
+    }
 
     if (newPasswordInput) newPasswordInput.value = "";
     if (confirmNewPasswordInput) {
@@ -371,6 +446,10 @@ function showPasswordResetScreen() {
 }
 
 
+/* =====================================================
+   13. SHOW DASHBOARD
+===================================================== */
+
 function showDashboard(profile) {
     currentProfile = profile;
     passwordRecoveryMode = false;
@@ -379,6 +458,7 @@ function showDashboard(profile) {
     if (passwordResetScreen) {
         passwordResetScreen.hidden = true;
     }
+
     if (dashboard) dashboard.hidden = false;
 
     if (manageServicesAction) {
@@ -394,9 +474,15 @@ function showDashboard(profile) {
         newCustomerSection.hidden = true;
     }
 
+    if (paymentManagementSection) {
+        paymentManagementSection.hidden = true;
+    }
+
     if (authStatus) {
         const name = profile.full_name || "GLS User";
-        const role = profile.role === "admin" ? "Admin" : "Staff";
+
+        const role =
+            profile.role === "admin" ? "Admin" : "Staff";
 
         authStatus.textContent = `${name} · ${role}`;
     }
@@ -417,7 +503,7 @@ function showDashboard(profile) {
 
 
 /* =====================================================
-   11. VERIFY USER PROFILE
+   14. VERIFY USER PROFILE
 ===================================================== */
 
 async function verifyAndDisplayUser(session) {
@@ -446,7 +532,9 @@ async function verifyAndDisplayUser(session) {
             error.message
         );
 
-        await glsSupabase.auth.signOut({ scope: "local" });
+        await glsSupabase.auth.signOut({
+            scope: "local"
+        });
 
         showLoginScreen(
             "Unable to verify your GLS profile. Please contact the administrator."
@@ -460,7 +548,9 @@ async function verifyAndDisplayUser(session) {
         profile.is_active !== true ||
         !["admin", "staff"].includes(profile.role)
     ) {
-        await glsSupabase.auth.signOut({ scope: "local" });
+        await glsSupabase.auth.signOut({
+            scope: "local"
+        });
 
         showLoginScreen(
             "This account has no active GLS profile. Please contact the administrator."
@@ -475,7 +565,7 @@ async function verifyAndDisplayUser(session) {
 
 
 /* =====================================================
-   12. LOGIN
+   15. LOGIN
 ===================================================== */
 
 async function handleLogin(event) {
@@ -499,7 +589,10 @@ async function handleLogin(event) {
     loginSubmit.disabled = true;
     loginSubmit.textContent = "Signing In...";
 
-    setLoginMessage("Verifying your account...", "info");
+    setLoginMessage(
+        "Verifying your account...",
+        "info"
+    );
 
     try {
         const {
@@ -511,7 +604,10 @@ async function handleLogin(event) {
         });
 
         if (error) {
-            console.error("GLS login failed:", error.message);
+            console.error(
+                "GLS login failed:",
+                error.message
+            );
 
             setLoginMessage(
                 "Sign-in failed. Check your email and password, then try again."
@@ -528,7 +624,10 @@ async function handleLogin(event) {
         await verifyAndDisplayUser(data.session);
 
     } catch (error) {
-        console.error("Unexpected GLS login error:", error);
+        console.error(
+            "Unexpected GLS login error:",
+            error
+        );
 
         setLoginMessage(
             "An unexpected error occurred. Please try again."
@@ -543,7 +642,7 @@ async function handleLogin(event) {
 
 
 /* =====================================================
-   13. PASSWORD RESET
+   16. RESET PASSWORD
 ===================================================== */
 
 async function handlePasswordReset(event) {
@@ -605,7 +704,9 @@ async function handlePasswordReset(event) {
         confirmNewPasswordInput.value = "";
 
         const { error: signOutError } =
-            await glsSupabase.auth.signOut({ scope: "local" });
+            await glsSupabase.auth.signOut({
+                scope: "local"
+            });
 
         if (signOutError) {
             console.warn(
@@ -670,7 +771,7 @@ async function handleBackToLogin() {
 
 
 /* =====================================================
-   14. LOGOUT
+   17. LOGOUT
 ===================================================== */
 
 async function handleLogout() {
@@ -684,7 +785,10 @@ async function handleLogout() {
     });
 
     if (error) {
-        console.error("GLS logout failed:", error.message);
+        console.error(
+            "GLS logout failed:",
+            error.message
+        );
 
         logoutButton.disabled = false;
         logoutButton.textContent = "Log Out";
@@ -699,7 +803,7 @@ async function handleLogout() {
 
 
 /* =====================================================
-   15. SERVICE FORM HELPERS
+   18. SERVICES — FORM HELPERS
 ===================================================== */
 
 function clearServiceForm() {
@@ -732,7 +836,7 @@ function setServiceFormBusy(isBusy) {
 
 
 /* =====================================================
-   16. RENDER SERVICES
+   19. SERVICES — RENDER LIST
 ===================================================== */
 
 function renderServices(serviceRows) {
@@ -804,7 +908,7 @@ function renderServices(serviceRows) {
 
 
 /* =====================================================
-   17. LOAD SERVICES FOR ADMIN
+   20. SERVICES — LOAD FROM SUPABASE
 ===================================================== */
 
 async function loadServices() {
@@ -848,20 +952,10 @@ async function loadServices() {
                 error.message
             );
 
-            if (servicesList) {
-                servicesList.replaceChildren();
-
-                const errorMessage = document.createElement("div");
-                errorMessage.className = "services-loading";
-                errorMessage.textContent =
-                    "Unable to load services. Please check your Admin access and database policies.";
-
-                servicesList.appendChild(errorMessage);
-            }
+            renderServices([]);
 
             setServiceFormMessage(
-                "Unable to load services.",
-                "error"
+                "Unable to load services. Check Admin access and database policies."
             );
 
             return;
@@ -880,6 +974,8 @@ async function loadServices() {
             error
         );
 
+        renderServices([]);
+
         setServiceFormMessage(
             "An unexpected error occurred while loading services."
         );
@@ -891,7 +987,7 @@ async function loadServices() {
 
 
 /* =====================================================
-   18. OPEN AND CLOSE SERVICES PANEL
+   21. SERVICES — OPEN/CLOSE/EDIT/SAVE
 ===================================================== */
 
 async function openServicesPanel() {
@@ -900,9 +996,15 @@ async function openServicesPanel() {
         return;
     }
 
-    if (!servicesManagementSection) return;
-
     servicesManagementSection.hidden = false;
+
+    if (newCustomerSection) {
+        newCustomerSection.hidden = true;
+    }
+
+    if (paymentManagementSection) {
+        paymentManagementSection.hidden = true;
+    }
 
     servicesManagementSection.scrollIntoView({
         behavior: "smooth",
@@ -916,17 +1018,10 @@ async function openServicesPanel() {
 
 
 function closeServicesPanelHandler() {
-    if (servicesManagementSection) {
-        servicesManagementSection.hidden = true;
-    }
-
+    servicesManagementSection.hidden = true;
     clearServiceForm();
 }
 
-
-/* =====================================================
-   19. EDIT SERVICE
-===================================================== */
 
 function editService(service) {
     if (!currentProfile || currentProfile.role !== "admin") {
@@ -956,10 +1051,6 @@ function editService(service) {
     serviceNameInput.focus();
 }
 
-
-/* =====================================================
-   20. SAVE SERVICE
-===================================================== */
 
 async function handleServiceSave(event) {
     event.preventDefault();
@@ -1052,7 +1143,7 @@ async function handleServiceSave(event) {
             );
 
             setServiceFormMessage(
-                "The service could not be saved. Check your Admin access and database permissions."
+                "The service could not be saved. Check Admin access and database permissions."
             );
 
             return;
@@ -1087,7 +1178,7 @@ async function handleServiceSave(event) {
 
 
 /* =====================================================
-   21. CUSTOMER FORM HELPERS
+   22. CUSTOMER — FORM HELPERS
 ===================================================== */
 
 function resetCustomerServiceOptions(
@@ -1134,7 +1225,7 @@ function setCustomerFormBusy(isBusy) {
 
 
 /* =====================================================
-   22. LOAD ACTIVE SERVICES FOR SELECTED VEHICLE
+   23. CUSTOMER — LOAD ACTIVE SERVICES
 ===================================================== */
 
 async function loadCustomerServicesForVehicle() {
@@ -1152,14 +1243,7 @@ async function loadCustomerServicesForVehicle() {
 
     if (!vehicleType) return;
 
-    customerServiceSelect.disabled = true;
-
     try {
-        /*
-         * Only active services for the selected vehicle type
-         * are shown. Database RLS remains in force.
-         */
-
         const {
             data,
             error
@@ -1193,7 +1277,6 @@ async function loadCustomerServicesForVehicle() {
 
         const placeholder = document.createElement("option");
         placeholder.value = "";
-
         placeholder.textContent =
             activeServicesForVehicle.length > 0
                 ? "Select a car wash service"
@@ -1221,7 +1304,7 @@ async function loadCustomerServicesForVehicle() {
 
         if (activeServicesForVehicle.length === 0) {
             setCustomerFormMessage(
-                "There are no active services for this vehicle type. Ask the Admin to activate or add a service.",
+                "No active services for this vehicle. Ask the Admin to activate or add a service.",
                 "info"
             );
         }
@@ -1243,10 +1326,6 @@ async function loadCustomerServicesForVehicle() {
 }
 
 
-/* =====================================================
-   23. UPDATE SELECTED SERVICE PRICE
-===================================================== */
-
 function updateSelectedCustomerServicePrice() {
     const serviceId = customerServiceSelect.value;
 
@@ -1254,18 +1333,13 @@ function updateSelectedCustomerServicePrice() {
         item => item.id === serviceId
     );
 
-    if (!service) {
-        customerPriceDisplay.textContent = formatRM(0);
-        return;
-    }
-
     customerPriceDisplay.textContent =
-        formatRM(service.price);
+        service ? formatRM(service.price) : formatRM(0);
 }
 
 
 /* =====================================================
-   24. OPEN AND CLOSE CUSTOMER PANEL
+   24. CUSTOMER — OPEN/CLOSE/SAVE
 ===================================================== */
 
 function openCustomerPanel() {
@@ -1276,13 +1350,15 @@ function openCustomerPanel() {
         return;
     }
 
-    if (!newCustomerSection) return;
+    newCustomerSection.hidden = false;
 
     if (servicesManagementSection) {
         servicesManagementSection.hidden = true;
     }
 
-    newCustomerSection.hidden = false;
+    if (paymentManagementSection) {
+        paymentManagementSection.hidden = true;
+    }
 
     clearCustomerForm();
 
@@ -1291,24 +1367,15 @@ function openCustomerPanel() {
         block: "start"
     });
 
-    if (customerNameInput) {
-        customerNameInput.focus();
-    }
+    customerNameInput.focus();
 }
 
 
 function closeCustomerPanelHandler() {
-    if (newCustomerSection) {
-        newCustomerSection.hidden = true;
-    }
-
+    newCustomerSection.hidden = true;
     clearCustomerForm();
 }
 
-
-/* =====================================================
-   25. SAVE CUSTOMER AND TRANSACTION
-===================================================== */
 
 async function handleCustomerSave(event) {
     event.preventDefault();
@@ -1320,27 +1387,17 @@ async function handleCustomerSave(event) {
 
     if (customerSaveInProgress) return;
 
-    const customerName =
-        customerNameInput.value.trim();
+    const customerName = customerNameInput.value.trim();
+    const customerPhone = customerPhoneInput.value.trim();
+    const vehicleType = customerVehicleTypeInput.value;
+    const serviceId = customerServiceSelect.value;
 
-    const customerPhone =
-        customerPhoneInput.value.trim();
-
-    const vehicleType =
-        customerVehicleTypeInput.value;
-
-    const serviceId =
-        customerServiceSelect.value;
-
-    const selectedService =
-        activeServicesForVehicle.find(
-            item => item.id === serviceId
-        );
+    const selectedService = activeServicesForVehicle.find(
+        item => item.id === serviceId
+    );
 
     if (!vehicleType) {
-        setCustomerFormMessage(
-            "Select the vehicle type."
-        );
+        setCustomerFormMessage("Select the vehicle type.");
         customerVehicleTypeInput.focus();
         return;
     }
@@ -1352,12 +1409,6 @@ async function handleCustomerSave(event) {
         customerServiceSelect.focus();
         return;
     }
-
-    /*
-     * The database trigger obtains the authoritative service
-     * price, service name and vehicle type from Supabase.
-     * The front-end price is only used for display.
-     */
 
     const transactionData = {
         customer_name: customerName || null,
@@ -1402,7 +1453,7 @@ async function handleCustomerSave(event) {
             );
 
             setCustomerFormMessage(
-                "The transaction could not be saved. Check your login, active profile, service selection and database permissions."
+                "The transaction could not be saved. Check your account, service selection and database permissions."
             );
 
             return;
@@ -1410,13 +1461,8 @@ async function handleCustomerSave(event) {
 
         clearCustomerForm();
 
-        const receiptText =
-            data && data.receipt_no
-                ? ` Receipt number: ${data.receipt_no}.`
-                : "";
-
         setCustomerFormMessage(
-            `Customer and transaction saved successfully.${receiptText} Payment is still unpaid.`,
+            `Transaction saved successfully. Receipt #${data.receipt_no}. Payment is still unpaid.`,
             "success"
         );
 
@@ -1438,7 +1484,460 @@ async function handleCustomerSave(event) {
 
 
 /* =====================================================
-   26. DASHBOARD QUICK ACTIONS
+   25. PAYMENT — RENDER UNPAID TRANSACTIONS
+===================================================== */
+
+function isTestTransaction(transaction) {
+    const serviceName =
+        String(transaction.service_name_snapshot || "").toLowerCase();
+
+    const customerName =
+        String(transaction.customer_name || "").toLowerCase();
+
+    return (
+        serviceName.includes("test") ||
+        serviceName.includes("jangan guna") ||
+        customerName.includes("test") ||
+        customerName.includes("jangan guna")
+    );
+}
+
+
+function createPaymentDetail(label, value) {
+    const paragraph = document.createElement("p");
+
+    const strong = document.createElement("strong");
+    strong.textContent = `${label}: `;
+
+    const span = document.createElement("span");
+    span.textContent = value;
+
+    paragraph.appendChild(strong);
+    paragraph.appendChild(span);
+
+    return paragraph;
+}
+
+
+function renderUnpaidTransactions(rows) {
+    if (!unpaidTransactionsList) return;
+
+    unpaidTransactionsList.replaceChildren();
+
+    if (!rows || rows.length === 0) {
+        const empty = document.createElement("div");
+
+        empty.className = "services-loading";
+        empty.textContent =
+            "No unpaid transactions found.";
+
+        unpaidTransactionsList.appendChild(empty);
+        return;
+    }
+
+    rows.forEach((transaction) => {
+        const card = document.createElement("article");
+        card.className = "unpaid-transaction-card";
+
+        const heading = document.createElement("div");
+        heading.className = "unpaid-transaction-heading";
+
+        const title = document.createElement("h3");
+        title.textContent = `Receipt #${transaction.receipt_no}`;
+
+        const amount = document.createElement("strong");
+        amount.className = "unpaid-transaction-amount";
+        amount.textContent = formatRM(transaction.amount);
+
+        heading.appendChild(title);
+        heading.appendChild(amount);
+
+        const details = document.createElement("div");
+        details.className = "unpaid-transaction-details";
+
+        details.appendChild(
+            createPaymentDetail(
+                "Customer",
+                transaction.customer_name || "Walk-in customer"
+            )
+        );
+
+        details.appendChild(
+            createPaymentDetail(
+                "Vehicle",
+                transaction.vehicle_type
+            )
+        );
+
+        details.appendChild(
+            createPaymentDetail(
+                "Service",
+                transaction.service_name_snapshot
+            )
+        );
+
+        details.appendChild(
+            createPaymentDetail(
+                "Created",
+                formatMalaysiaDateTime(transaction.created_at)
+            )
+        );
+
+        card.appendChild(heading);
+        card.appendChild(details);
+
+        const testRecord = isTestTransaction(transaction);
+
+        if (testRecord) {
+            const warning = document.createElement("p");
+
+            warning.className = "payment-test-warning";
+            warning.textContent =
+                "TEST RECORD — Payment disabled to prevent false revenue.";
+
+            card.appendChild(warning);
+
+            const blockedNote = document.createElement("p");
+            blockedNote.className = "payment-test-note";
+            blockedNote.textContent =
+                "Keep this transaction unpaid. Do not use it as a real payment record.";
+
+            card.appendChild(blockedNote);
+
+        } else {
+            const form = document.createElement("form");
+            form.className = "payment-record-form";
+
+            const label = document.createElement("label");
+            label.textContent = "Payment Method";
+
+            const methodSelect = document.createElement("select");
+            methodSelect.required = true;
+            methodSelect.setAttribute(
+                "aria-label",
+                `Payment method for receipt ${transaction.receipt_no}`
+            );
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Select payment method";
+
+            methodSelect.appendChild(placeholder);
+
+            const paymentMethods = [
+                ["cash", "Cash"],
+                ["qr", "QR Payment"],
+                ["other", "Other"]
+            ];
+
+            paymentMethods.forEach(([value, text]) => {
+                const option = document.createElement("option");
+
+                option.value = value;
+                option.textContent = text;
+
+                methodSelect.appendChild(option);
+            });
+
+            const submitButton = document.createElement("button");
+
+            submitButton.type = "submit";
+            submitButton.className = "primary-button";
+            submitButton.textContent = "Record Payment";
+
+            form.appendChild(label);
+            form.appendChild(methodSelect);
+            form.appendChild(submitButton);
+
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                const method = methodSelect.value;
+
+                if (!method) {
+                    setPaymentFormMessage(
+                        `Select a payment method for receipt #${transaction.receipt_no}.`
+                    );
+                    methodSelect.focus();
+                    return;
+                }
+
+                await recordTransactionPayment(
+                    transaction,
+                    method,
+                    submitButton,
+                    methodSelect
+                );
+            });
+
+            card.appendChild(form);
+        }
+
+        unpaidTransactionsList.appendChild(card);
+    });
+}
+
+
+/* =====================================================
+   26. PAYMENT — LOAD UNPAID TRANSACTIONS
+===================================================== */
+
+async function loadUnpaidTransactions() {
+    if (!glsSupabase || !currentProfile) return;
+
+    if (paymentsLoading) return;
+
+    paymentsLoading = true;
+
+    if (refreshPaymentListButton) {
+        refreshPaymentListButton.disabled = true;
+        refreshPaymentListButton.textContent = "Loading...";
+    }
+
+    if (unpaidTransactionsList) {
+        unpaidTransactionsList.replaceChildren();
+
+        const loading = document.createElement("div");
+        loading.className = "services-loading";
+        loading.textContent = "Loading unpaid transactions...";
+
+        unpaidTransactionsList.appendChild(loading);
+    }
+
+    setPaymentFormMessage(
+        "Loading unpaid transactions from Supabase...",
+        "info"
+    );
+
+    try {
+        const {
+            data,
+            error
+        } = await glsSupabase
+            .from("transactions")
+            .select(
+                "id, receipt_no, customer_name, vehicle_type, service_name_snapshot, amount, created_at, payment_status"
+            )
+            .eq("payment_status", "unpaid")
+            .order("created_at", { ascending: true });
+
+        if (error) {
+            console.error(
+                "GLS unpaid transaction loading failed:",
+                error.message
+            );
+
+            if (unpaidTransactionsList) {
+                unpaidTransactionsList.replaceChildren();
+
+                const errorMessage = document.createElement("div");
+                errorMessage.className = "services-loading";
+                errorMessage.textContent =
+                    "Unable to load unpaid transactions. Check account access and database policies.";
+
+                unpaidTransactionsList.appendChild(errorMessage);
+            }
+
+            setPaymentFormMessage(
+                "Unable to load unpaid transactions.",
+                "error"
+            );
+
+            return;
+        }
+
+        renderUnpaidTransactions(data || []);
+
+        setPaymentFormMessage(
+            `${(data || []).length} unpaid transaction(s) found.`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Unexpected payment loading error:",
+            error
+        );
+
+        if (unpaidTransactionsList) {
+            unpaidTransactionsList.replaceChildren();
+
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "services-loading";
+            errorMessage.textContent =
+                "Unexpected error while loading transactions.";
+
+            unpaidTransactionsList.appendChild(errorMessage);
+        }
+
+        setPaymentFormMessage(
+            "An unexpected error occurred while loading transactions."
+        );
+
+    } finally {
+        paymentsLoading = false;
+
+        if (refreshPaymentListButton) {
+            refreshPaymentListButton.disabled = false;
+            refreshPaymentListButton.textContent = "Refresh";
+        }
+    }
+}
+
+
+/* =====================================================
+   27. PAYMENT — OPEN/CLOSE PANEL
+===================================================== */
+
+async function openPaymentPanel() {
+    if (!currentProfile) {
+        showLoginScreen(
+            "Please sign in before accessing the system."
+        );
+        return;
+    }
+
+    if (paymentManagementSection) {
+        paymentManagementSection.hidden = false;
+    }
+
+    if (servicesManagementSection) {
+        servicesManagementSection.hidden = true;
+    }
+
+    if (newCustomerSection) {
+        newCustomerSection.hidden = true;
+    }
+
+    paymentManagementSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    await loadUnpaidTransactions();
+}
+
+
+function closePaymentPanelHandler() {
+    if (paymentManagementSection) {
+        paymentManagementSection.hidden = true;
+    }
+
+    setPaymentFormMessage("");
+}
+
+
+/* =====================================================
+   28. PAYMENT — RECORD VIA SECURE DATABASE FUNCTION
+===================================================== */
+
+async function recordTransactionPayment(
+    transaction,
+    paymentMethod,
+    submitButton,
+    methodSelect
+) {
+    if (!glsSupabase || !currentProfile) {
+        setPaymentFormMessage(
+            "Please sign in before recording a payment."
+        );
+        return;
+    }
+
+    if (paymentSaveInProgress) return;
+
+    /*
+     * Prevent test data from being marked as real income.
+     * The database function is used for real payment records.
+     */
+
+    if (isTestTransaction(transaction)) {
+        setPaymentFormMessage(
+            "Payment is disabled for test records."
+        );
+        return;
+    }
+
+    if (!["cash", "qr", "other"].includes(paymentMethod)) {
+        setPaymentFormMessage(
+            "Choose a valid payment method."
+        );
+        return;
+    }
+
+    paymentSaveInProgress = true;
+
+    submitButton.disabled = true;
+    methodSelect.disabled = true;
+    submitButton.textContent = "Recording...";
+
+    setPaymentFormMessage(
+        `Recording payment for receipt #${transaction.receipt_no}...`,
+        "info"
+    );
+
+    try {
+        /*
+         * Use the SECURITY DEFINER database function.
+         * The database records:
+         * - logged-in payment receiver
+         * - payment method
+         * - paid_at timestamp
+         *
+         * The browser cannot choose payment_received_by.
+         */
+
+        const {
+            error
+        } = await glsSupabase.rpc(
+            "record_payment",
+            {
+                p_transaction_id: transaction.id,
+                p_payment_method: paymentMethod
+            }
+        );
+
+        if (error) {
+            console.error(
+                "GLS payment recording failed:",
+                error.message
+            );
+
+            setPaymentFormMessage(
+                "Payment was not recorded. The transaction may already be paid, or the database rejected the operation. Refresh the list and try again if appropriate."
+            );
+
+            return;
+        }
+
+        await loadUnpaidTransactions();
+
+        setPaymentFormMessage(
+            `Payment recorded successfully for receipt #${transaction.receipt_no}.`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error(
+            "Unexpected payment recording error:",
+            error
+        );
+
+        setPaymentFormMessage(
+            "An unexpected error occurred. Verify the transaction status before trying again."
+        );
+
+    } finally {
+        paymentSaveInProgress = false;
+        submitButton.disabled = false;
+        methodSelect.disabled = false;
+        submitButton.textContent = "Record Payment";
+    }
+}
+
+
+/* =====================================================
+   29. DASHBOARD QUICK ACTIONS
 ===================================================== */
 
 function showNotice(feature) {
@@ -1459,10 +1958,12 @@ function showNotice(feature) {
         return;
     }
 
-    const messages = {
-        "Record Payment":
-            "Payment recording will be implemented in the next layer.",
+    if (feature === "Record Payment") {
+        openPaymentPanel();
+        return;
+    }
 
+    const messages = {
         "Customer Records":
             "Customer record browsing is not available yet.",
 
@@ -1478,7 +1979,7 @@ function showNotice(feature) {
 
 
 /* =====================================================
-   27. INITIALISE APPLICATION
+   30. INITIALISE APPLICATION
 ===================================================== */
 
 async function initialiseGLS() {
@@ -1533,7 +2034,13 @@ async function initialiseGLS() {
         customerPriceDisplay,
         customerFormMessage,
         customerSaveButton,
-        customerClearButton
+        customerClearButton,
+
+        paymentManagementSection,
+        closePaymentPanel,
+        refreshPaymentListButton,
+        paymentFormMessage,
+        unpaidTransactionsList
     ];
 
     if (requiredElements.some(element => !element)) {
@@ -1554,8 +2061,8 @@ async function initialiseGLS() {
     }
 
     /*
-     * Correct placeholder check:
-     * never compare the Publishable Key with itself.
+     * Correct key validation.
+     * Do not compare the key with itself.
      */
 
     if (
@@ -1583,7 +2090,7 @@ async function initialiseGLS() {
     );
 
 
-    /* Login, reset and logout */
+    /* Authentication forms */
 
     loginForm.addEventListener(
         "submit",
@@ -1606,7 +2113,7 @@ async function initialiseGLS() {
     );
 
 
-    /* Services management */
+    /* Services forms */
 
     serviceForm.addEventListener(
         "submit",
@@ -1624,7 +2131,7 @@ async function initialiseGLS() {
     );
 
 
-    /* Customer registration */
+    /* Customer forms */
 
     customerForm.addEventListener(
         "submit",
@@ -1652,6 +2159,19 @@ async function initialiseGLS() {
     );
 
 
+    /* Payment panel */
+
+    closePaymentPanel.addEventListener(
+        "click",
+        closePaymentPanelHandler
+    );
+
+    refreshPaymentListButton.addEventListener(
+        "click",
+        loadUnpaidTransactions
+    );
+
+
     /* Authentication state changes */
 
     glsSupabase.auth.onAuthStateChange(
@@ -1670,7 +2190,7 @@ async function initialiseGLS() {
     );
 
 
-    /* Restore existing session */
+    /* Restore session */
 
     try {
         const {
@@ -1715,7 +2235,7 @@ async function initialiseGLS() {
 
 
 /* =====================================================
-   28. START APPLICATION
+   31. START APPLICATION
 ===================================================== */
 
 if (document.readyState === "loading") {
