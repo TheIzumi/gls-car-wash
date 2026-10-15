@@ -665,7 +665,7 @@ async function initialiseGLS() {
     !GLS_SUPABASE_PUBLISHABLE_KEY ||
     GLS_SUPABASE_PUBLISHABLE_KEY.trim() === "" ||
     GLS_SUPABASE_PUBLISHABLE_KEY.includes(
-        "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+        "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk"
     )
 ) {
     setLoginMessage(
