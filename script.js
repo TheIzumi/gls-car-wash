@@ -664,9 +664,8 @@ async function initialiseGLS() {
     if (
     !GLS_SUPABASE_PUBLISHABLE_KEY ||
     GLS_SUPABASE_PUBLISHABLE_KEY.trim() === "" ||
-    GLS_SUPABASE_PUBLISHABLE_KEY.includes(
+    GLS_SUPABASE_PUBLISHABLE_KEY ===
         "sb_publishable_LeQuTjkWs3U9lidfPTi4Vw_X9tWo2bk"
-    )
 ) {
     setLoginMessage(
         "Supabase setup is incomplete. Add the Publishable Key in script.js."
